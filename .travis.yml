@@ -1,0 +1,10 @@
+language: java
+install: true
+jdk:
+  - openjdk8
+addons:
+  sonarcloud:
+    organization: "cesto93"
+    token: $SONAR_TOKEN
+script:
+  - mvn clean verify install sonar:sonar -Pcoverage -Dsonar.projectKey=$PROJECT_KEY -Dsonar.language=java -Dsonar.sources=src -Dsonar.java.binaries=.
