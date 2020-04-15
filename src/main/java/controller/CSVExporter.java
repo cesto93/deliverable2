@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import model.GitFileWithRelease;
+import model.FileByRelease;
 import model.ReleaseInfo;
 
 public class CSVExporter {
@@ -35,7 +35,7 @@ public class CSVExporter {
 		}
 	}
 	
-	public static void printGitFileWithRelease(GitFileWithRelease[] rs, String file) {
+	public static void printGitFileWithRelease(FileByRelease[] rs, String file) {
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	

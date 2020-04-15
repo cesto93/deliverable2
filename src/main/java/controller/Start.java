@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import model.BugTicket;
-import model.GitFileWithRelease;
+import model.FileByRelease;
 import model.ReleaseInfo;
 
 public class Start {
@@ -33,9 +33,9 @@ public class Start {
 		LOGGER.log(Level.INFO, tickets.toString());
 			
 		Map<String, ArrayList<String>> files = retriever.getFiles(keys.toArray(new String[0]), extIgnored);
-		LOGGER.log(Level.INFO, files.toString());
+		LOGGER.log(Level.INFO, () -> files.toString());
 			
-		GitFileWithRelease[] gitFiles = GitFileWithReleaseController.orderFile(files, tickets, releases);
+		FileByRelease[] gitFiles = FileByReleaseController.orderFile(files, tickets, releases);
 		CSVExporter.printGitFileWithRelease(gitFiles,  projName + "File.csv");
 		LOGGER.log(Level.INFO, "Done");
 	}

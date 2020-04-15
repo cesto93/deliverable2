@@ -2,12 +2,12 @@ package model;
 
 import java.util.Comparator;
 
-public class GitFileWithRelease {
+public class FileByRelease {
 	private String name;
 	private ReleaseInfo releaseInfo;
 	private boolean bugginess;
 	
-	public GitFileWithRelease(String name, ReleaseInfo releaseInfo, boolean bugginess) {
+	public FileByRelease(String name, ReleaseInfo releaseInfo, boolean bugginess) {
 		this.name = name;
 		this.releaseInfo = releaseInfo;
 		this.bugginess = bugginess;
@@ -35,15 +35,15 @@ public class GitFileWithRelease {
 		this.bugginess = bugginess;
 	}
 	
-	public int compareName(GitFileWithRelease gitFile) {
+	public int compareName(FileByRelease gitFile) {
 		return this.getName().compareTo(gitFile.getName());
 	}
 	
 
-	public static Comparator<GitFileWithRelease> getComparator() {
-		Comparator<GitFileWithRelease> byRelease = (GitFileWithRelease a, GitFileWithRelease b) -> 
+	public static Comparator<FileByRelease> getComparator() {
+		Comparator<FileByRelease> byRelease = (FileByRelease a, FileByRelease b) -> 
 						a.getReleaseInfo().compareDate(b.getReleaseInfo());
-		Comparator<GitFileWithRelease> byFile = (GitFileWithRelease c, GitFileWithRelease d) -> 
+		Comparator<FileByRelease> byFile = (FileByRelease c, FileByRelease d) -> 
 						c.compareName(d);
 		return byRelease.thenComparing(byFile);
 	}
