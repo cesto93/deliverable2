@@ -2,6 +2,7 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +21,7 @@ public class JIRATicketRetriever {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	public static HashMap<String, BugTicket> readTicketKeysAndVersion(String projName) {
+	public static Map<String, BugTicket> readTicketKeysAndVersion(String projName) {
 		Integer j = 0;
 		Integer i = 0;
 		Integer total = 1;

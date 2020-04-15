@@ -28,16 +28,18 @@ public class BugTicket {
 	
 	@Override
 	public String toString() {
-		String s = key;
-		s += " Affected versions: ";
+		StringBuilder bld = new StringBuilder();
+		bld.append(key);
+		bld.append(" Affected versions: ");
 		for (String av : this.affectedVersions) {
-			s = s + av + " ";
+			bld.append(av);
+			bld.append(" ");
 		}
-		s += "Fixed versions: ";
+		bld.append("Fixed versions: ");
 		for (String fv : this.fixedVersions) {
-			s = s + fv + " ";
+			bld.append(fv);
+			bld.append(" ");
 		}
-		return s;
-		
+		return bld.toString();
 	}
 }

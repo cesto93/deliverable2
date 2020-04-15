@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,7 +46,7 @@ public class GitLogRetriever {
 		}
 	}
 	
-	public HashMap<String, ArrayList<String>> getFiles(String[] keys, String[] extIgnored) {
+	public Map<String, ArrayList<String>> getFiles(String[] keys, String[] extIgnored) {
 		HashMap<String, ArrayList<String>> res = new HashMap<>();
 		for (String key : keys) {
 			ProcessBuilder pb = new ProcessBuilder( "git", "log", "--name-only", "--oneline", "--max-count=1", 
@@ -60,9 +61,9 @@ public class GitLogRetriever {
 				
 				while ((line = stdInput.readLine()) != null) {
 					if (!line.contains(key) && !endsWith(line, extIgnored))
-					files.add(line);
+						files.add(line);
 				}
-				if (files.size() != 0) 
+				if (!files.isEmpty()) 
 					res.put(key, files);
 				if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
 					LOGGER.log(Level.SEVERE, readErrors(p));

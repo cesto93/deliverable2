@@ -3,6 +3,7 @@ package controller;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,8 +25,7 @@ public class ReleaseInfoController {
 		throw new IllegalStateException("Utility class");
 	}
 	
-	public static HashMap<String, ReleaseInfo> getReleaseInfo(String projName) {
-		//Fills the arraylist with releases dates and orders them
+	public static Map<String, ReleaseInfo> getReleaseInfo(String projName) {
 		//Ignores releases with missing dates
 		// If 2 release has the same dates pick the last one
 		
