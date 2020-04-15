@@ -4,7 +4,6 @@ package controller;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.TreeSet;
 
 import model.BugTicket;
 import model.GitFileWithRelease;
