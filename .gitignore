@@ -1,0 +1,11 @@
+### Eclipse
+.settings/
+.classpath
+.project
+
+###Maven
+/target/
+
+### csv result
+BOOKKEEPERVersionInfo.csv
+BOOKKEEPERFile.csv
