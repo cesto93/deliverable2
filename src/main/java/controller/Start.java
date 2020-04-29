@@ -28,18 +28,21 @@ public class Start {
 			return;
 			
 		CSVExporter.printReleaseInfo(releases, projName + "VersionInfo.csv");
+		LOGGER.log(Level.INFO, "Done writing release");
 		
 		//remove last half of versions
 		releases = Arrays.copyOfRange(releases, 0, releases.length / 2);
 		BugTicket[] tickets = JIRATicketRetriever.readTicketKeysAndVersion(projName);
+		LOGGER.log(Level.INFO, "Done getting tickets");
 		
 		gitController.setGitCommitsTickets(tickets);
+		LOGGER.log(Level.INFO, "Done getting commits");
 		gitController.addFileToCommits(tickets);
-		//LOGGER.log(Level.INFO, tickets.toString());
+		LOGGER.log(Level.INFO, "Done getting files");
 		
 		Map<String, ArrayList<BugTicket>> bugByRelease =  ReleaseController.getBugByRelease(releases, tickets);
 		
-		FileByRelease[] files = FileByReleaseController.getFileByRelease(gitController, bugByRelease, releases);
+		FileByRelease[] files = FileByReleaseController.getFileByRelease(bugByRelease, releases);
 		FileByReleaseController.setLoc(gitController, files);
 		FileByReleaseController.setFileBuggy(gitController, files, bugByRelease);
 		CSVExporter.printGitFileWithRelease(files,  projName + "File.csv");

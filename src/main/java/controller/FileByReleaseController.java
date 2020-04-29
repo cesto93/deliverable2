@@ -16,8 +16,7 @@ public class FileByReleaseController {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	public static FileByRelease[] getFileByRelease(GitObjectController controller, 
-													Map<String, ArrayList<BugTicket>> bugByRelease, 
+	public static FileByRelease[] getFileByRelease(Map<String, ArrayList<BugTicket>> bugByRelease, 
 													Release[] releases) {
 		TreeSet<FileByRelease> gitFiles = new TreeSet<>(FileByRelease.getComparator());
 		for (Release release: releases) {

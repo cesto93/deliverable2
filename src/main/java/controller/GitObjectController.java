@@ -2,6 +2,7 @@ package controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import model.BugTicket;
@@ -42,7 +43,7 @@ public class GitObjectController {
 		file.setLOC(retriever.getLOC(file.getHash()));
 	}
 	
-	public ArrayList<String> getFileModifiedByTicket(BugTicket ticket) {
+	public List<String> getFileModifiedByTicket(BugTicket ticket) {
 		ArrayList<String> modifiedFiles = new ArrayList<>();
 		for (GitCommit commit : ticket.getCommits()) {
 			modifiedFiles.addAll(retriever.getFilesModifiedByCommit(commit.getHash(), extTaken));

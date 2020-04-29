@@ -51,7 +51,6 @@ public class GitCommit implements Comparable<GitCommit> {
 
 	
 	public int compareTo(GitCommit commit) {
-		// TODO Auto-generated method stub
 		return this.getDate().compareTo(commit.getDate());
 	}
 	

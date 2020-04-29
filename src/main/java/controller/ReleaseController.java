@@ -2,6 +2,7 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -10,6 +11,10 @@ import model.GitCommit;
 import model.Release;
 
 public class ReleaseController {
+	
+	private ReleaseController() {
+	    throw new IllegalStateException("Utility class");
+	}
 	
 	public static Map<String, ArrayList<BugTicket>> getBugByRelease(Release[] releases, BugTicket[] tickets) {
 		HashMap<String, ArrayList<BugTicket>> map = new HashMap<>(); 
@@ -26,7 +31,7 @@ public class ReleaseController {
 		return map;
 	}
 	
-	public static GitCommit getLastCommit(ArrayList<BugTicket> bugs) {
+	public static GitCommit getLastCommit(List<BugTicket> bugs) {
 		TreeSet<GitCommit> commits = new TreeSet<>();
 		for(BugTicket bug : bugs) {
 			if (bug.getCommits().length != 0) {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -19,12 +20,17 @@ public class GitLogRetriever {
 	private static final Logger LOGGER = Logger.getLogger(GitLogRetriever.class.getName());
 	private File repo;
 	private File parent;
+	private static final String oneline = "--oneline";
 	
 	public GitLogRetriever(String repoURL, String repoPath) {
 		this.repo = new File(repoPath);
 		parent = repo.getParentFile();
 		if (!repoExist()) 
 			createRepo(repoURL);
+	}
+	
+	private static String grep(String key) {
+		return "--grep=" + key + ":";
 	}
 	
 	private boolean repoExist() {
@@ -52,8 +58,7 @@ public class GitLogRetriever {
 	
 	public LocalDate[] getCommitsDate(String key) {
 		ArrayList<LocalDate> res = new ArrayList<>();
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--date=short", "--pretty=format:\"%cd\"",
-									 "--grep=" + key);
+		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--date=short", "--pretty=format:\"%cd\"", grep(key));
 		pb.directory(repo);
 			
 		try {
@@ -77,7 +82,7 @@ public class GitLogRetriever {
 	public String[] getCommitsHash(String key) {
 		ArrayList<String> commits = new ArrayList<>();
 		
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--oneline", "--grep=" + key + ":");
+		ProcessBuilder pb = new ProcessBuilder( "git", "log", oneline, grep(key));
 		pb.directory(repo);
 			
 		try {
@@ -101,7 +106,7 @@ public class GitLogRetriever {
 	public int getLOC(String fileHash) {
 		ProcessBuilder pb = new ProcessBuilder( "git", "cat-file", "-p", fileHash);
 		pb.directory(repo);
-		int LOC = 0;
+		int loc = 0;
 		try {
 			String line;
 			Process p = pb.start();
@@ -109,7 +114,7 @@ public class GitLogRetriever {
 				
 			while ((line = stdInput.readLine()) != null) {
 				if (line.length() != 0) {
-					LOC++;
+					loc++;
 				}
 			}
 			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
@@ -118,7 +123,7 @@ public class GitLogRetriever {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				Thread.currentThread().interrupt();
 		}
-		return LOC;
+		return loc;
 	}
 	
 	public Map<String, GitFile> getFiles(String hash, String[] extTaken) {
@@ -148,8 +153,8 @@ public class GitLogRetriever {
 		return files;
 	}
 	
-	public ArrayList<String> getFilesModifiedByCommit(String hash, String[] extTaken) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "show", hash, "--name-only", "--oneline");
+	public List<String> getFilesModifiedByCommit(String hash, String[] extTaken) {
+		ProcessBuilder pb = new ProcessBuilder( "git", "show", hash, "--name-only", oneline);
 		pb.directory(repo);
 		ArrayList<String> files = new ArrayList<>();
 		
@@ -172,9 +177,8 @@ public class GitLogRetriever {
 		return files;
 	}
 	
-	public ArrayList<String> getFilesModifiedByTicket(String key, String[] extTaken) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--name-only", "--oneline", 
-													"--grep=" + key + ":");
+	public List<String> getFilesModifiedByTicket(String key, String[] extTaken) {
+		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--name-only", oneline, grep(key));
 		pb.directory(repo);
 		ArrayList<String> files = new ArrayList<>();
 		

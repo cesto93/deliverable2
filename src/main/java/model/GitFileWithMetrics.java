@@ -2,12 +2,12 @@ package model;
 
 public class GitFileWithMetrics extends GitFile {
 	private boolean buggy;
-	private int LOC;
+	private int loc;
 	
 	public GitFileWithMetrics(String name, String hash) {
 		super(name, hash);
 		this.buggy = false;
-		LOC = -1;
+		loc = -1;
 	}
 	
 	public boolean isBuggy() {
@@ -19,11 +19,11 @@ public class GitFileWithMetrics extends GitFile {
 	}
 	
 	public int getLOC() {
-		return LOC;
+		return loc;
 	}
 
-	public void setLOC(int lOC) {
-		LOC = lOC;
+	public void setLOC(int loc) {
+		this.loc = loc;
 	}
 
 }
