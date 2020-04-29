@@ -3,13 +3,13 @@ package model;
 import java.time.LocalDateTime;
 
 
-public class ReleaseInfo {
+public class Release {
 	
 	private String versionID;
 	private String versionName;
 	private LocalDateTime date;
 	
-	public ReleaseInfo(String id, String name, LocalDateTime date) {
+	public Release(String id, String name, LocalDateTime date) {
 		this.setVersionID(id);
 		this.setVersionName(name);
 		this.setDate(date);
@@ -39,7 +39,7 @@ public class ReleaseInfo {
 		this.date = date;
 	}
 	
-	public int compareDate(ReleaseInfo r) {
+	public int compareDate(Release r) {
 		return this.date.compareTo(r.date);
 	}
 

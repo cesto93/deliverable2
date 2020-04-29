@@ -3,50 +3,44 @@ package model;
 import java.util.Comparator;
 
 public class FileByRelease {
-	private String name;
-	private ReleaseInfo releaseInfo;
-	private boolean bugginess;
+	private Release release;
+	private GitFileWithMetrics file;
 	
-	public FileByRelease(String name, ReleaseInfo releaseInfo, boolean bugginess) {
-		this.name = name;
-		this.releaseInfo = releaseInfo;
-		this.bugginess = bugginess;
+	public FileByRelease(Release release, GitFile file) {
+		this.file = new GitFileWithMetrics(file.getName(), file.getHash());
+		this.release = release;
 	}
 	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
+	public FileByRelease(Release release, GitFileWithMetrics file) {
+		this.file = file;
+		this.release = release;
 	}
 	
-	public ReleaseInfo getReleaseInfo() {
-		return releaseInfo;
+	public Release getRelease() {
+		return release;
 	}
 	
-	public void setReleaseInfo(ReleaseInfo releaseInfo) {
-		this.releaseInfo = releaseInfo;
+	public void setRelease(Release releaseInfo) {
+		this.release = releaseInfo;
 	}
 	
-	public Boolean getBugginess() {
-		return bugginess;
+	public GitFileWithMetrics getFile() {
+		return file;
 	}
-	public void setBugginess(Boolean bugginess) {
-		this.bugginess = bugginess;
+
+	public void setFile(GitFileWithMetrics file) {
+		this.file = file;
 	}
 	
 	public int compareName(FileByRelease gitFile) {
-		return this.getName().compareTo(gitFile.getName());
+		return this.getFile().getName().compareTo(gitFile.getFile().getName());
 	}
-	
 
 	public static Comparator<FileByRelease> getComparator() {
 		Comparator<FileByRelease> byRelease = (FileByRelease a, FileByRelease b) -> 
-						a.getReleaseInfo().compareDate(b.getReleaseInfo());
+						a.getRelease().compareDate(b.getRelease());
 		Comparator<FileByRelease> byFile = (FileByRelease c, FileByRelease d) -> 
 						c.compareName(d);
 		return byRelease.thenComparing(byFile);
 	}
-	
-	
 }

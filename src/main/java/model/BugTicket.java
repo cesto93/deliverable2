@@ -4,6 +4,7 @@ public class BugTicket {
 	private String key;
 	private String[] affectedVersions;
 	private String[] fixedVersions;
+	private GitCommit[] commits; //ordered by Date
 	
 	public BugTicket(String key, String[] affectedVersions, String[] fixedVersions) {
 		this.affectedVersions = affectedVersions;
@@ -24,6 +25,18 @@ public class BugTicket {
 	
 	public String[] getFixedVersions() {
 		return fixedVersions;
+	}
+
+	public GitCommit[] getCommits() {
+		return commits;
+	}
+
+	public void setCommits(GitCommit[] commits) {
+		this.commits = commits;
+	}
+	
+	public GitCommit getLastCommit() {
+		return commits[commits.length - 1];
 	}
 	
 	@Override
