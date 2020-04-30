@@ -1,10 +1,11 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GitCommit implements Comparable<GitCommit> {
+public class GitCommit  {
 	private String hash;
 	private Map<String, GitFile> files;
 	private LocalDate date;
@@ -50,8 +51,9 @@ public class GitCommit implements Comparable<GitCommit> {
 	}
 
 	
-	public int compareTo(GitCommit commit) {
-		return this.getDate().compareTo(commit.getDate());
+	public static Comparator<GitCommit> getComparator() {
+		Comparator<GitCommit> byDate = (GitCommit a, GitCommit b) ->  a.getDate().compareTo(b.getDate());
+		return byDate;
 	}
 	
 }

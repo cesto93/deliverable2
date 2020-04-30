@@ -41,10 +41,12 @@ public class Start {
 		LOGGER.log(Level.INFO, "Done getting files");
 		
 		Map<String, ArrayList<BugTicket>> bugByRelease =  ReleaseController.getBugByRelease(releases, tickets);
-		
 		FileByRelease[] files = FileByReleaseController.getFileByRelease(bugByRelease, releases);
+		LOGGER.log(Level.INFO, "Done ordering release");
 		FileByReleaseController.setLoc(gitController, files);
-		FileByReleaseController.setFileBuggy(gitController, files, bugByRelease);
+		LOGGER.log(Level.INFO, "Done setLOC");
+		FileByReleaseController.setFileBuggy(gitController, files, bugByRelease, tickets);
+		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileWithRelease(files,  projName + "File.csv");
 		LOGGER.log(Level.INFO, "Done");
 		

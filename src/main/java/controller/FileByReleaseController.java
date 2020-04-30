@@ -2,6 +2,8 @@ package controller;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
@@ -39,11 +41,17 @@ public class FileByReleaseController {
 	}
 	
 	public static void setFileBuggy(GitObjectController controller, 
-									FileByRelease[] files, Map<String, ArrayList<BugTicket>> bugByRelease) {
+									FileByRelease[] files, Map<String, ArrayList<BugTicket>> bugByRelease,
+									BugTicket[] bugs) {
+		HashMap<String, List<String>> filesPerBug = new HashMap<>();
+		for (BugTicket bug : bugs) {
+			filesPerBug.put(bug.getKey(), controller.getFileModifiedByTicket(bug));
+		}
 		for (FileByRelease file : files) {
 			for (BugTicket bug : bugByRelease.get(file.getRelease().getVersionID())) {
-				if (controller.getFileModifiedByTicket(bug).contains(file.getFile().getName())) {
+				if (filesPerBug.get(bug.getKey()).contains(file.getFile().getName())) {
 					file.getFile().setBuggy(true);
+					break;
 				}
 			}
 		}

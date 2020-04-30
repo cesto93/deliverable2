@@ -21,11 +21,13 @@ public class GitObjectController {
 	
 	public void setGitCommitsTickets(BugTicket[] tickets) {	
 		for (BugTicket ticket :  tickets) {
-			String[] hashes = retriever.getCommitsHash(ticket.getKey());
-			LocalDate[] dates = retriever.getCommitsDate(ticket.getKey());
-			TreeSet<GitCommit> temp = new TreeSet<>();
-			for (int i = 0; i < hashes.length; i++) {
-				temp.add(new GitCommit(hashes[i], dates[i]));
+			List<String> hashes = retriever.getCommitsHash(ticket.getKey());
+			//List<LocalDate> dates = retriever.getCommitsDate(ticket.getKey());
+			TreeSet<GitCommit> temp = new TreeSet<>(GitCommit.getComparator());
+			for (int i = 0; i < hashes.size(); i++) {
+				LocalDate date = retriever.getCommitDate(hashes.get(i));
+				temp.add(new GitCommit(hashes.get(i), date));
+				
 			}
 			ticket.setCommits(temp.toArray(new GitCommit[0]));
 		}

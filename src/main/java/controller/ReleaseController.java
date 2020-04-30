@@ -32,7 +32,7 @@ public class ReleaseController {
 	}
 	
 	public static GitCommit getLastCommit(List<BugTicket> bugs) {
-		TreeSet<GitCommit> commits = new TreeSet<>();
+		TreeSet<GitCommit> commits = new TreeSet<>(GitCommit.getComparator());
 		for(BugTicket bug : bugs) {
 			if (bug.getCommits().length != 0) {
 				commits.add(bug.getLastCommit());

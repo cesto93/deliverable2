@@ -19,7 +19,7 @@ import org.json.JSONArray;
 public class JIRATicketRetriever {
 	
 	private static final Logger LOGGER = Logger.getLogger(JIRATicketRetriever.class.getName());
-	private static final String baseUrl = "https://issues.apache.org/jira/rest/api/2";
+	private static final String BASEURL = "https://issues.apache.org/jira/rest/api/2";
 	
 	private JIRATicketRetriever() {
 	    throw new IllegalStateException("Utility class");
@@ -43,7 +43,7 @@ public class JIRATicketRetriever {
 		do {
 			//Only gets a max of 1000 at a time, so must do this multiple times if res >1000
 			j = i + 1000;
-			String url = baseUrl + "/search?jql=project=%22"
+			String url = BASEURL + "/search?jql=project=%22"
 					+ projName + "%22AND%22issueType%22=%22Bug%22" + "AND(%22status%22=%22closed%22OR"
 					+ "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22" 
 					+ "&fields=key,resolutiondate,versions,fixVersions,created&startAt="
@@ -83,7 +83,7 @@ public class JIRATicketRetriever {
 		// If 2 release has the same dates pick the last one
 		
 		TreeMap<LocalDateTime, Release> releases = new TreeMap<>();
-		String url = baseUrl + "/project/" + projName;
+		String url = BASEURL + "/project/" + projName;
 		JSONObject json;
 		try {
 			json = JSONReader.readJsonFromUrl(url);
