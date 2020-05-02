@@ -55,14 +55,18 @@ public class GitLogRetriever {
 		}
 	}
 	
+	private Process getProcess(String ... par) throws IOException {
+		ProcessBuilder pb = new ProcessBuilder(par);
+		pb.directory(repo);
+		return pb.start();
+	}
+	
 	public LocalDate getCommitDate(String hash) {
 		LocalDate res = null;
-		ProcessBuilder pb = new ProcessBuilder( "git", "show", "--no-patch", "--no-notes", "--date=short",
-												"--pretty=format:\"%cd\"", hash);
-		pb.directory(repo);
-			
+
 		try {
-			Process p = pb.start();
+			Process p =  getProcess("git", "show", "--no-patch", "--no-notes", "--date=short",
+												"--pretty=format:\"%cd\"", hash);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			
@@ -80,11 +84,10 @@ public class GitLogRetriever {
 	
 	public List<LocalDate> getCommitsDate(String key) {
 		ArrayList<LocalDate> res = new ArrayList<>();
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--date=short", "--pretty=format:\"%cd\"", grep(key));
-		pb.directory(repo);
+		
 			
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "log", "--date=short", "--pretty=format:\"%cd\"", grep(key));
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 			
@@ -103,12 +106,9 @@ public class GitLogRetriever {
 	
 	public List<String> getCommitsHash(LocalDate before) {
 		ArrayList<String> commits = new ArrayList<>();
-		
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--before=" + before.toString(), ONELINE);
-		pb.directory(repo);
 			
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "log", "--before=" + before.toString(), ONELINE);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				
@@ -127,13 +127,10 @@ public class GitLogRetriever {
 	
 	public List<String> getCommitsHash(LocalDate before, LocalDate after) {
 		ArrayList<String> commits = new ArrayList<>();
-		
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--before=" + before.toString(), 
-												"--after=" + after.toString(), ONELINE);
-		pb.directory(repo);
 			
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "log", "--before=" + before.toString(), "--after=" + after.toString(), 
+									ONELINE);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				
@@ -152,12 +149,9 @@ public class GitLogRetriever {
 	
 	public List<String> getCommitsHash(String key) {
 		ArrayList<String> commits = new ArrayList<>();
-		
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", ONELINE, grep(key));
-		pb.directory(repo);
 			
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "log", ONELINE, grep(key));
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				
@@ -175,12 +169,10 @@ public class GitLogRetriever {
 	}
 	
 	public int getLOC(String fileHash) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "cat-file", "-p", fileHash);
-		pb.directory(repo);
 		int loc = 0;
 		try {
 			String line;
-			Process p = pb.start();
+			Process p = getProcess( "git", "cat-file", "-p", fileHash);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 				
 			while ((line = stdInput.readLine()) != null) {
@@ -198,12 +190,10 @@ public class GitLogRetriever {
 	}
 	
 	public List<GitFile> getFiles(String hash, String[] extTaken) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "ls-tree", "-r", hash);
-		pb.directory(repo);
 		TreeMap<String, GitFile> files = new TreeMap<>();
 			
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "ls-tree", "-r", hash);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				
@@ -225,12 +215,10 @@ public class GitLogRetriever {
 	}
 	
 	public List<String> getFilesModifiedByCommit(String hash, String[] extTaken) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "show", hash, "--name-only", ONELINE);
-		pb.directory(repo);
 		ArrayList<String> files = new ArrayList<>();
 		
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "show", hash, "--name-only", ONELINE);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				
@@ -250,12 +238,10 @@ public class GitLogRetriever {
 	
 	//unused
 	public List<String> getFilesModifiedByTicket(String key, String[] extTaken) {
-		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--name-only", ONELINE, grep(key));
-		pb.directory(repo);
 		ArrayList<String> files = new ArrayList<>();
 		
 		try {
-			Process p = pb.start();
+			Process p = getProcess( "git", "log", "--name-only", ONELINE, grep(key));
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String line;
 				

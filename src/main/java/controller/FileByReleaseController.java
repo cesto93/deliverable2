@@ -37,7 +37,7 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public static void setFileBuggy(FileByRelease[] files, Release[] releases) {
+	public static void setFileBuggy(FileByRelease[] files) {
 		for (FileByRelease file : files) {
 			for (BugTicket bug : file.getRelease().getBugs()) {
 					if (bug.getFileNames().contains(file.getFile().getName())) {

@@ -16,8 +16,8 @@ public class Start {
 	public static void main(String[] args) {
 		final String projName ="BOOKKEEPER";
 		final String urlProj = "https://github.com/apache/bookkeeper";
-		final String repoPathProj = "/home/pier/git/bookkeeper/";
 		final String[] extTaken = {".java", ".cpp"};
+		final String repoPathProj = "/home/pier/git/bookkeeper/";
 		//ZOOKEEPER
 		
 		GitLogRetriever retriever = new GitLogRetriever(urlProj, repoPathProj);
@@ -44,7 +44,7 @@ public class Start {
 		
 		fbrController.setLoc(files);
 		LOGGER.log(Level.INFO, "Done setLOC");
-		FileByReleaseController.setFileBuggy(files, releases);
+		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileWithRelease(files,  projName + "File.csv");
 		LOGGER.log(Level.INFO, "Done");
