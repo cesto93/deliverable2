@@ -17,10 +17,10 @@ public class Start {
 	
 	public static void main(String[] args) {
 		final String[] extTaken = {".java", ".cpp"};
-		final String projName = GetProperty.getInstance().getProperty("projectName");
-		final String urlProj = GetProperty.getInstance().getProperty("urlProject");
-		File repoPathProj = new File(GetProperty.getInstance().getProperty("repoPath"), 
-										GetProperty.getInstance().getProperty("repoDir"));
+		final String projName = GetProperty.getProperty("projectName");
+		final String urlProj = GetProperty.getProperty("urlProject");
+		File repoPathProj = new File(GetProperty.getProperty("repoPath"), 
+										GetProperty.getProperty("repoDir"));
 		//ZOOKEEPER
 		
 		GitLogRetriever retriever = new GitLogRetriever(urlProj, repoPathProj);
