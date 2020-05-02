@@ -21,8 +21,8 @@ public class GitLogRetriever {
 	private File parent;
 	private static final String ONELINE = "--oneline";
 	
-	public GitLogRetriever(String repoURL, String repoPath) {
-		this.repo = new File(repoPath);
+	public GitLogRetriever(String repoURL, File repo) {
+		this.repo = repo;
 		parent = repo.getParentFile();
 		if (!repoExist()) 
 			createRepo(repoURL);

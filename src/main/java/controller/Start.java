@@ -1,6 +1,7 @@
 package controller;
 
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,16 +9,18 @@ import java.util.logging.Logger;
 import model.BugTicket;
 import model.FileByRelease;
 import model.ReleaseInfo;
+import utils.GetProperty;
 import model.Release;
 
 public class Start {
 	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
 	
 	public static void main(String[] args) {
-		final String projName ="BOOKKEEPER";
-		final String urlProj = "https://github.com/apache/bookkeeper";
 		final String[] extTaken = {".java", ".cpp"};
-		final String repoPathProj = "/home/pier/git/bookkeeper/";
+		final String projName = GetProperty.getInstance().getProperty("projectName");
+		final String urlProj = GetProperty.getInstance().getProperty("urlProject");
+		File repoPathProj = new File(GetProperty.getInstance().getProperty("repoPath"), 
+										GetProperty.getInstance().getProperty("repoDir"));
 		//ZOOKEEPER
 		
 		GitLogRetriever retriever = new GitLogRetriever(urlProj, repoPathProj);
