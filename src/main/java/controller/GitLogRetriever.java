@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,7 +58,7 @@ public class GitLogRetriever {
 	public LocalDate getCommitDate(String hash) {
 		LocalDate res = null;
 		ProcessBuilder pb = new ProcessBuilder( "git", "show", "--no-patch", "--no-notes", "--date=short",
-												"--pretty=format:\"%cd\"");
+												"--pretty=format:\"%cd\"", hash);
 		pb.directory(repo);
 			
 		try {
@@ -100,6 +99,55 @@ public class GitLogRetriever {
 				Thread.currentThread().interrupt();
 			}
 		return res;
+	}
+	
+	public List<String> getCommitsHash(LocalDate before) {
+		ArrayList<String> commits = new ArrayList<>();
+		
+		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--before=" + before.toString(), ONELINE);
+		pb.directory(repo);
+			
+		try {
+			Process p = pb.start();
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line;
+				
+			while ((line = stdInput.readLine()) != null) {
+					commits.add(line.split(" ")[0]);
+			}
+
+			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, readErrors(p));
+			} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return commits;
+	}
+	
+	public List<String> getCommitsHash(LocalDate before, LocalDate after) {
+		ArrayList<String> commits = new ArrayList<>();
+		
+		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--before=" + before.toString(), 
+												"--after=" + after.toString(), ONELINE);
+		pb.directory(repo);
+			
+		try {
+			Process p = pb.start();
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			String line;
+				
+			while ((line = stdInput.readLine()) != null) {
+					commits.add(line.split(" ")[0]);
+			}
+
+			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, readErrors(p));
+			} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return commits;
 	}
 	
 	public List<String> getCommitsHash(String key) {
@@ -149,7 +197,7 @@ public class GitLogRetriever {
 		return loc;
 	}
 	
-	public Map<String, GitFile> getFiles(String hash, String[] extTaken) {
+	public List<GitFile> getFiles(String hash, String[] extTaken) {
 		ProcessBuilder pb = new ProcessBuilder( "git", "ls-tree", "-r", hash);
 		pb.directory(repo);
 		TreeMap<String, GitFile> files = new TreeMap<>();
@@ -173,7 +221,7 @@ public class GitLogRetriever {
 				Thread.currentThread().interrupt();
 		}
 		
-		return files;
+		return new ArrayList<>(files.values());
 	}
 	
 	public List<String> getFilesModifiedByCommit(String hash, String[] extTaken) {
@@ -200,6 +248,7 @@ public class GitLogRetriever {
 		return files;
 	}
 	
+	//unused
 	public List<String> getFilesModifiedByTicket(String key, String[] extTaken) {
 		ProcessBuilder pb = new ProcessBuilder( "git", "log", "--name-only", ONELINE, grep(key));
 		pb.directory(repo);

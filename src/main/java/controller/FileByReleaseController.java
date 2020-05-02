@@ -1,31 +1,28 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.TreeSet;
 
 import model.BugTicket;
 import model.FileByRelease;
+import model.GitCommit;
 import model.GitFile;
 import model.Release;
 
 public class FileByReleaseController {
+	private GitLogRetriever retriever;
+	private String[] extTaken;
 	
-	private FileByReleaseController() {
-	    throw new IllegalStateException("Utility class");
+	public FileByReleaseController(GitLogRetriever retriever, String[] extTaken) {
+	    this.retriever = retriever;
+	    this.extTaken = extTaken;
 	}
 	
-	public static FileByRelease[] getFileByRelease(Map<String, ArrayList<BugTicket>> bugByRelease, 
-													Release[] releases) {
+	public FileByRelease[] getFileByRelease(Release[] releases) {
 		TreeSet<FileByRelease> gitFiles = new TreeSet<>(FileByRelease.getComparator());
-		for (Release release: releases) {
-			ArrayList<BugTicket> bugs = bugByRelease.get(release.getVersionID());
-			if (bugs.size() != 0) {
-				Collection<GitFile> files =  ReleaseController.getLastCommit(bugs).getFiles().values();
-				for(GitFile file : files) {
+		for (Release release : releases) {
+			GitCommit last;
+			if ((last = release.getLastCommit()) != null ) {
+				for (GitFile file : retriever.getFiles(last.getHash(), extTaken)) {
 					FileByRelease byRelease = new FileByRelease(release, file);
 					gitFiles.add(byRelease);
 				}
@@ -34,25 +31,19 @@ public class FileByReleaseController {
 		return gitFiles.toArray(new FileByRelease[0]);
 	}
 	
-	public static void setLoc(GitObjectController controller, FileByRelease[] files) {
+	public void setLoc(FileByRelease[] files) {
 		for (FileByRelease file : files) {
-			controller.setLOC(file.getFile());
+			file.getFile().setLOC(retriever.getLOC(file.getFile().getHash()));
 		}
 	}
 	
-	public static void setFileBuggy(GitObjectController controller, 
-									FileByRelease[] files, Map<String, ArrayList<BugTicket>> bugByRelease,
-									BugTicket[] bugs) {
-		HashMap<String, List<String>> filesPerBug = new HashMap<>();
-		for (BugTicket bug : bugs) {
-			filesPerBug.put(bug.getKey(), controller.getFileModifiedByTicket(bug));
-		}
+	public static void setFileBuggy(FileByRelease[] files, Release[] releases) {
 		for (FileByRelease file : files) {
-			for (BugTicket bug : bugByRelease.get(file.getRelease().getVersionID())) {
-				if (filesPerBug.get(bug.getKey()).contains(file.getFile().getName())) {
-					file.getFile().setBuggy(true);
-					break;
-				}
+			for (BugTicket bug : file.getRelease().getBugs()) {
+					if (bug.getFileNames().contains(file.getFile().getName())) {
+						file.getFile().setBuggy(true);
+						break;
+					}
 			}
 		}
 	}

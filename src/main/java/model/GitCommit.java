@@ -2,23 +2,18 @@ package model;
 
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.Map;
-import java.util.TreeMap;
 
 public class GitCommit  {
 	private String hash;
-	private Map<String, GitFile> files;
 	private LocalDate date;
 	
 	public GitCommit(String hash, LocalDate date) {
 		this.setHash(hash);
 		this.setDate(date);
-		files = new TreeMap<>();
 	}
 	
-	public GitCommit(String hash, Map <String, GitFile> files) {
+	public GitCommit(String hash) {
 		this.setHash(hash);
-		this.setFiles(files);
 	}
 	
 	@Override
@@ -42,18 +37,8 @@ public class GitCommit  {
 		this.date = date;
 	}
 
-	public Map<String, GitFile> getFiles() {
-		return files;
-	}
-
-	public void setFiles(Map<String, GitFile> files) {
-		this.files = files;
-	}
-
-	
 	public static Comparator<GitCommit> getComparator() {
-		Comparator<GitCommit> byDate = (GitCommit a, GitCommit b) ->  a.getDate().compareTo(b.getDate());
-		return byDate;
+		return (GitCommit a, GitCommit b) ->  a.getDate().compareTo(b.getDate());
 	}
 	
 }

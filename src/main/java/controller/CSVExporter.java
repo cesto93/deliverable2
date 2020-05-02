@@ -9,7 +9,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import model.FileByRelease;
-import model.Release;
+import model.ReleaseInfo;
 
 public class CSVExporter {
 	
@@ -19,14 +19,14 @@ public class CSVExporter {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	public static void printReleaseInfo(Release[] rs, String file) {
+	public static void printReleaseInfo(ReleaseInfo[] rs, String file) {
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
 		    	printer.printRecord("Index","Version ID","Version Name","Date");
 		    	int pos = 1;
-		    	for (Release r : rs) {
+		    	for (ReleaseInfo r : rs) {
 		    		printer.printRecord(pos, r.getVersionID(), r.getVersionName(), r.getDate());
 		    		pos++;
 		    	}
@@ -54,7 +54,8 @@ public class CSVExporter {
 		    							toText(rs[0].getFile().isBuggy()));
 		    	
 		    	for (int i = 1; i < rs.length; i++) {
-		    		if (rs[i].getRelease().getVersionID() != rs[i - 1].getRelease().getVersionID())
+		    		if (rs[i].getRelease().getReleaseInfo().getVersionID() != 
+		    				rs[i - 1].getRelease().getReleaseInfo().getVersionID())
 		    			indexRel++;
 		    		
 		    		printer.printRecord(indexRel, rs[i].getFile().getName(), rs[i].getFile().getLOC(), 

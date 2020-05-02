@@ -20,8 +20,8 @@ public class FileByRelease {
 		return release;
 	}
 	
-	public void setRelease(Release releaseInfo) {
-		this.release = releaseInfo;
+	public void setRelease(Release release) {
+		this.release = release;
 	}
 	
 	public GitFileWithMetrics getFile() {
@@ -38,7 +38,7 @@ public class FileByRelease {
 
 	public static Comparator<FileByRelease> getComparator() {
 		Comparator<FileByRelease> byRelease = (FileByRelease a, FileByRelease b) -> 
-						a.getRelease().compareDate(b.getRelease());
+						a.getRelease().getReleaseInfo().compareDate(b.getRelease().getReleaseInfo());
 		Comparator<FileByRelease> byFile = (FileByRelease c, FileByRelease d) -> 
 						c.compareName(d);
 		return byRelease.thenComparing(byFile);

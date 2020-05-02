@@ -1,46 +1,41 @@
 package model;
 
-import java.time.LocalDateTime;
-
-
 public class Release {
+	private ReleaseInfo releaseInfo;
+	private GitCommit[] commits;
+	private BugTicket[] bugs;
 	
-	private String versionID;
-	private String versionName;
-	private LocalDateTime date;
-	
-	public Release(String id, String name, LocalDateTime date) {
-		this.setVersionID(id);
-		this.setVersionName(name);
-		this.setDate(date);
-	}
-
-	public String getVersionID() {
-		return versionID;
-	}
-
-	public void setVersionID(String versionID) {
-		this.versionID = versionID;
-	}
-
-	public String getVersionName() {
-		return versionName;
-	}
-
-	public void setVersionName(String versionName) {
-		this.versionName = versionName;
-	}
-
-	public LocalDateTime getDate() {
-		return date;
-	}
-
-	public void setDate(LocalDateTime date) {
-		this.date = date;
+	public Release(ReleaseInfo releaseInfo, GitCommit[] commits, BugTicket[] bugs) {
+		this.releaseInfo = releaseInfo;
+		this.commits = commits;
+		this.bugs = bugs;
 	}
 	
-	public int compareDate(Release r) {
-		return this.date.compareTo(r.date);
+	public ReleaseInfo getReleaseInfo() {
+		return releaseInfo;
+	}
+	public void setRelease(ReleaseInfo releaseInfo) {
+		this.releaseInfo = releaseInfo;
+	}
+	public GitCommit[] getCommits() {
+		return commits;
+	}
+	public void setCommits(GitCommit[] commits) {
+		this.commits = commits;
 	}
 
+	public BugTicket[] getBugs() {
+		return bugs;
+	}
+
+	public void setBugs(BugTicket[] bugs) {
+		this.bugs = bugs;
+	}
+	
+	public GitCommit getLastCommit() {
+		if (this.getCommits().length == 0)
+			return null;
+		return this.getCommits()[this.getCommits().length - 1];
+	}
+	
 }
