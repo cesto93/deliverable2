@@ -21,4 +21,8 @@ public class GitFile {
 	public void setHash(String hash) {
 		this.hash = hash;
 	}
+	
+	public int compareName(GitFile gitFile) {
+		return this.getName().compareTo(gitFile.getName());
+	}
 }

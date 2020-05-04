@@ -3,6 +3,7 @@ package controller;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,14 +43,18 @@ public class Start {
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
 		LOGGER.log(Level.INFO, "Done getting release commits");
 		
-		FileByRelease[] files = fbrController.getFileByRelease(releases);
+		List<FileByRelease> files = fbrController.getFileByRelease(releases);
 		LOGGER.log(Level.INFO, "Done getting file by release");
 		
 		fbrController.setLoc(files);
 		LOGGER.log(Level.INFO, "Done setLOC");
+		fbrController.setnRevisions(files);
+		LOGGER.log(Level.INFO, "Done setNRev");
+		fbrController.setnAuth(files);
+		LOGGER.log(Level.INFO, "Done setNAuth");
 		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
-		CSVExporter.printGitFileWithRelease(files,  projName + "File.csv");
+		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");
 		LOGGER.log(Level.INFO, "Done");
 		
 	}

@@ -1,18 +1,14 @@
 package model;
 
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FileByRelease {
 	private Release release;
-	private GitFileWithMetrics file;
+	private List<FileWithMetrics> files;
 	
-	public FileByRelease(Release release, GitFile file) {
-		this.file = new GitFileWithMetrics(file.getName(), file.getHash());
-		this.release = release;
-	}
-	
-	public FileByRelease(Release release, GitFileWithMetrics file) {
-		this.file = file;
+	public FileByRelease(Release release) {
+		this.files = new ArrayList<>();
 		this.release = release;
 	}
 	
@@ -24,23 +20,11 @@ public class FileByRelease {
 		this.release = release;
 	}
 	
-	public GitFileWithMetrics getFile() {
-		return file;
+	public List<FileWithMetrics> getFiles() {
+		return files;
 	}
 
-	public void setFile(GitFileWithMetrics file) {
-		this.file = file;
-	}
-	
-	public int compareName(FileByRelease gitFile) {
-		return this.getFile().getName().compareTo(gitFile.getFile().getName());
-	}
-
-	public static Comparator<FileByRelease> getComparator() {
-		Comparator<FileByRelease> byRelease = (FileByRelease a, FileByRelease b) -> 
-						a.getRelease().getReleaseInfo().compareDate(b.getRelease().getReleaseInfo());
-		Comparator<FileByRelease> byFile = (FileByRelease c, FileByRelease d) -> 
-						c.compareName(d);
-		return byRelease.thenComparing(byFile);
+	public void setFiles(List<FileWithMetrics> files) {
+		this.files = files;
 	}
 }

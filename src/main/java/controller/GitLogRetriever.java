@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import model.GitFile;
-import model.GitFileWithMetrics;
+import model.FileWithMetrics;
 
 
 public class GitLogRetriever {
@@ -20,12 +20,15 @@ public class GitLogRetriever {
 	private File repo;
 	private File parent;
 	private static final String ONELINE = "--oneline";
+	private static final String BEFORE = "--before=";
+	private static final String AFTER = "--after=";
 	
 	public GitLogRetriever(String repoURL, File repo) {
 		this.repo = repo;
 		parent = repo.getParentFile();
 		if (!repoExist()) 
 			createRepo(repoURL);
+		LOGGER.setLevel(Level.INFO);
 	}
 	
 	private static String grep(String key) {
@@ -57,6 +60,7 @@ public class GitLogRetriever {
 	
 	private Process getProcess(String ... par) throws IOException {
 		ProcessBuilder pb = new ProcessBuilder(par);
+		LOGGER.log(Level.FINEST, pb.command().toString());
 		pb.directory(repo);
 		return pb.start();
 	}
@@ -102,37 +106,16 @@ public class GitLogRetriever {
 	}
 	
 	public List<String> getCommitsHash(LocalDate before) {
-		return getCommitsHashBase("git", "log", "--before=" + before.toString(), ONELINE);
+		return getCommitsHashBase("git", "log", BEFORE + before.toString(), ONELINE);
 	}
 	
 	public List<String> getCommitsHash(LocalDate before, LocalDate after) {
-		return getCommitsHashBase("git", "log", "--before=" + before.toString(), "--after=" + after.toString(), 
+		return getCommitsHashBase("git", "log", "--before=" + before.toString(), AFTER + after.toString(), 
 									ONELINE);
 	}
 	
 	public List<String> getCommitsHash(String key) {
 		return getCommitsHashBase("git", "log", ONELINE, grep(key));
-	}
-	
-	public int getLOC(String fileHash) {
-		int loc = 0;
-		try {
-			String line;
-			Process p = getProcess( "git", "cat-file", "-p", fileHash);
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				
-			while ((line = stdInput.readLine()) != null) {
-				if (line.length() != 0) {
-					loc++;
-				}
-			}
-			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
-				LOGGER.log(Level.SEVERE, readErrors(p));
-		} catch (IOException | InterruptedException e) {
-				LOGGER.log(Level.SEVERE, e.getMessage(), e);
-				Thread.currentThread().interrupt();
-		}
-		return loc;
 	}
 	
 	public List<GitFile> getFiles(String hash, String[] extTaken) {
@@ -146,7 +129,7 @@ public class GitLogRetriever {
 				if (endsWith(line, extTaken)) {
 					String fileHash = line.split(" ")[2].split("\t")[0];
 					String fileName = line.split("\t")[1];
-					files.put(fileName, new GitFileWithMetrics(fileName, fileHash));
+					files.put(fileName, new FileWithMetrics(fileName, fileHash));
 				}
 			}
 			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
@@ -176,6 +159,85 @@ public class GitLogRetriever {
 				Thread.currentThread().interrupt();
 		}
 		return files;
+	}
+	
+	public int getLOC(String fileHash) {
+		int loc = 0;
+		try {
+			String line;
+			Process p = getProcess("git", "cat-file", "-p", fileHash);
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+				
+			while ((line = stdInput.readLine()) != null) {
+				if (line.length() != 0) {
+					loc++;
+				}
+			}
+			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, readErrors(p));
+		} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return loc;
+	}
+	
+	private int getAuth(String ...cmd) {
+		int auth = 0;
+		try {
+			String line = null;
+			Process p = getProcess(cmd);
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((line = stdInput.readLine()) != null) {
+				if (line.length() != 0) {
+					auth++;
+				}
+			}
+			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, readErrors(p));
+		} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return auth;
+	}
+	
+	public int getAuth(String filename, LocalDate before) {
+		return getAuth("git", "shortlog", "master",  "-n", "-s", BEFORE + before.toString() , "--", filename );
+	}
+	
+	public int getAuth(String filename, LocalDate before, LocalDate after) {
+		return getAuth("git", "shortlog", "master", "-n", "-s", BEFORE + before.toString(), AFTER + after.toString(),
+						 "--", filename);
+	}
+	
+	private int getnRev(String ...cmd) {
+		int auth = 0;
+		try {
+			String line = null;
+			Process p = getProcess(cmd);
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((line = stdInput.readLine()) != null) {
+				if (line.length() != 0) {
+					auth += Integer.parseInt(line.split("\t")[0].trim());
+				}
+			}
+			if (p.waitFor() != 0 && LOGGER.isLoggable(Level.SEVERE))
+				LOGGER.log(Level.SEVERE, readErrors(p));
+		} catch (IOException | InterruptedException e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return auth;
+	}
+	
+	public int getnRev(String filename, LocalDate before) {
+		return getnRev("git", "shortlog", "master",  "-n", "-s", BEFORE + before.toString() , "--", filename );
+	}
+	
+	public int getnRev(String filename, LocalDate before, LocalDate after) {
+		return getnRev("git", "shortlog", "master", "-n", "-s", BEFORE + before.toString(), AFTER + after.toString(),
+						 "--", filename);
 	}
 	
 	private static boolean endsWith(String s, String[] keys) {

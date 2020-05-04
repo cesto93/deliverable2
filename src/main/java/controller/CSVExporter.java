@@ -2,6 +2,7 @@ package controller;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -9,6 +10,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import model.FileByRelease;
+import model.FileWithMetrics;
+import model.FileWithMetrics.CSVField;
 import model.ReleaseInfo;
 
 public class CSVExporter {
@@ -24,7 +27,7 @@ public class CSVExporter {
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-		    	printer.printRecord("Index","Version ID","Version Name","Date");
+		    	printer.printRecord("Index", "Version ID", "Version Name", "Date");
 		    	int pos = 1;
 		    	for (ReleaseInfo r : rs) {
 		    		printer.printRecord(pos, r.getVersionID(), r.getVersionName(), r.getDate());
@@ -35,32 +38,28 @@ public class CSVExporter {
 		}
 	}
 	
-	public static String toText(boolean bool) {
-		if (bool)
-			return "YES";
-		else
-			return "NO";
+	private static void printGitFileByRelease(CSVPrinter printer, int nRelease, FileWithMetrics file) throws IOException {
+		printer.printRecord(nRelease, file.getName(), file.getLOC(), file.getnRevisions(), file.getnAuth(), 
+							file.getBuggyText());
 	}
 	
-	public static void printGitFileWithRelease(FileByRelease[] rs, String file) {
+	public static void printGitFileByRelease(List<FileByRelease> files, String file) {
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-		    	printer.printRecord("Version", "File Name", "LOC", "Buggy");
-		    	int indexRel = 1;
+		    	printer.printRecord(FileWithMetrics.getFieldName(CSVField.VERSION), 
+		    						FileWithMetrics.getFieldName(CSVField.FILENAME),
+		    						FileWithMetrics.getFieldName(CSVField.LOC),
+		    						FileWithMetrics.getFieldName(CSVField.NREVISIONS),
+		    						FileWithMetrics.getFieldName(CSVField.NAUTH),
+		    						FileWithMetrics.getFieldName(CSVField.BUGGY));
 		    	
-		    	printer.printRecord(indexRel, rs[0].getFile().getName(), rs[0].getFile().getLOC(), 
-		    							toText(rs[0].getFile().isBuggy()));
-		    	
-		    	for (int i = 1; i < rs.length; i++) {
-		    		if (rs[i].getRelease().getReleaseInfo().getVersionID() != 
-		    				rs[i - 1].getRelease().getReleaseInfo().getVersionID())
-		    			indexRel++;
-		    		
-		    		printer.printRecord(indexRel, rs[i].getFile().getName(), rs[i].getFile().getLOC(), 
-		    								toText(rs[i].getFile().isBuggy()));
-		    	}
+		    	for (int i = 0; i < files.size(); i++) {
+					for (FileWithMetrics gitFile : files.get(i).getFiles()) {
+						printGitFileByRelease(printer, i + 1, gitFile);
+					}
+				}
 		} catch (IOException e) {
 		     LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}

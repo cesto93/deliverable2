@@ -1,11 +1,15 @@
 package controller;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeSet;
 
 import model.BugTicket;
 import model.FileByRelease;
 import model.GitCommit;
 import model.GitFile;
+import model.FileWithMetrics;
 import model.Release;
 
 public class FileByReleaseController {
@@ -17,33 +21,69 @@ public class FileByReleaseController {
 	    this.extTaken = extTaken;
 	}
 	
-	public FileByRelease[] getFileByRelease(Release[] releases) {
-		TreeSet<FileByRelease> gitFiles = new TreeSet<>(FileByRelease.getComparator());
+	public List<FileByRelease> getFileByRelease(Release[] releases) {
+		List<FileByRelease> res= new ArrayList<>();
 		for (Release release : releases) {
+			TreeSet<FileWithMetrics> filesInRel = new TreeSet<>(
+													(FileWithMetrics c, FileWithMetrics d) -> c.compareName(d));
+			FileByRelease byRelease = new FileByRelease(release);
 			GitCommit last;
 			if ((last = release.getLastCommit()) != null ) {
 				for (GitFile file : retriever.getFiles(last.getHash(), extTaken)) {
-					FileByRelease byRelease = new FileByRelease(release, file);
-					gitFiles.add(byRelease);
+					filesInRel.add(new FileWithMetrics(file.getName(), file.getHash()));
+				}
+			}
+			byRelease.setFiles(new ArrayList<>(filesInRel));
+			res.add(byRelease);
+		}
+		return res;
+	}
+	
+	public void setLoc(List<FileByRelease> files) {
+		for (FileByRelease filesInRel : files) {
+			for (FileWithMetrics file : filesInRel.getFiles())
+				file.setLOC(retriever.getLOC(file.getHash()));
+		}
+	}
+	
+	public static void setFileBuggy(List<FileByRelease> files) {
+		for (FileByRelease filesInRel : files) {
+			for (BugTicket bug : filesInRel.getRelease().getBugs()) { 
+				for (FileWithMetrics file : filesInRel.getFiles()) {
+					if (!file.isBuggy() && bug.getFileNames().contains(file.getName())) {
+						file.setBuggy(true);
+					}
 				}
 			}
 		}
-		return gitFiles.toArray(new FileByRelease[0]);
 	}
 	
-	public void setLoc(FileByRelease[] files) {
-		for (FileByRelease file : files) {
-			file.getFile().setLOC(retriever.getLOC(file.getFile().getHash()));
+	public void setnAuth(List<FileByRelease> files) {
+		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+		for (FileWithMetrics file: files.get(0).getFiles()) {
+			file.setnAuth(retriever.getAuth(file.getName(), before));
+		}
+		
+		for (int i = 1; i < files.size() ; i++) {
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
+			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			for (FileWithMetrics file: files.get(i).getFiles()) {
+				file.setnAuth(retriever.getAuth(file.getName(), before, after));
+			}
 		}
 	}
 	
-	public static void setFileBuggy(FileByRelease[] files) {
-		for (FileByRelease file : files) {
-			for (BugTicket bug : file.getRelease().getBugs()) {
-					if (bug.getFileNames().contains(file.getFile().getName())) {
-						file.getFile().setBuggy(true);
-						break;
-					}
+	public void setnRevisions(List<FileByRelease> files) {
+		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+		for (FileWithMetrics file: files.get(0).getFiles()) {
+			file.setnRevisions(retriever.getnRev(file.getName(), before));
+		}
+		
+		for (int i = 1; i < files.size() ; i++) {
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
+			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			for (FileWithMetrics file: files.get(i).getFiles()) {
+				file.setnRevisions(retriever.getnRev(file.getName(), before, after));
 			}
 		}
 	}
