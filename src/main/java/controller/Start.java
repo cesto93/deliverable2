@@ -38,6 +38,8 @@ public class Start {
 		BugTicket[] bugs = gitController.getBugTicket(projName);
 		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
 		
+		//TODO use proportion for missing affected versions
+		
 		//remove last half of versions
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2);
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
@@ -52,6 +54,8 @@ public class Start {
 		LOGGER.log(Level.INFO, "Done setNRev");
 		fbrController.setnAuth(files);
 		LOGGER.log(Level.INFO, "Done setNAuth");
+		fbrController.setLocTouchedAndChurn(files);
+		LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
 		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");

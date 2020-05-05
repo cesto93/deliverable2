@@ -9,14 +9,16 @@ import java.util.logging.Logger;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import model.CSVField;
 import model.FileByRelease;
-import model.FileWithMetrics;
-import model.FileWithMetrics.CSVField;
 import model.ReleaseInfo;
+import model.CSVField.CSVFields;
 
 public class CSVExporter {
 	
 	private static final Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
+	private static final CSVFields[] fields = new CSVFields[]{ CSVFields.VERSION, CSVFields.FILENAME, 
+			CSVFields.LOC, CSVFields.LOCTOUCHED, CSVFields.NREVISIONS, CSVFields.NAUTH, CSVFields.CHURN, CSVFields.BUGGY};
 	
 	private CSVExporter() {
 	    throw new IllegalStateException("Utility class");
@@ -38,26 +40,18 @@ public class CSVExporter {
 		}
 	}
 	
-	private static void printGitFileByRelease(CSVPrinter printer, int nRelease, FileWithMetrics file) throws IOException {
-		printer.printRecord(nRelease, file.getName(), file.getLOC(), file.getnRevisions(), file.getnAuth(), 
-							file.getBuggyText());
-	}
-	
 	public static void printGitFileByRelease(List<FileByRelease> files, String file) {
+		
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-		    	printer.printRecord(FileWithMetrics.getFieldName(CSVField.VERSION), 
-		    						FileWithMetrics.getFieldName(CSVField.FILENAME),
-		    						FileWithMetrics.getFieldName(CSVField.LOC),
-		    						FileWithMetrics.getFieldName(CSVField.NREVISIONS),
-		    						FileWithMetrics.getFieldName(CSVField.NAUTH),
-		    						FileWithMetrics.getFieldName(CSVField.BUGGY));
+				printer.printRecord(CSVField.getFieldsName(fields));
 		    	
 		    	for (int i = 0; i < files.size(); i++) {
-					for (FileWithMetrics gitFile : files.get(i).getFiles()) {
-						printGitFileByRelease(printer, i + 1, gitFile);
+					for (int j = 0; j < files.get(i).getFiles().size(); j++) {
+						printer.printRecord(files.get(i).getFieldsValues(i + 1, j, fields));
+						//printGitFileByRelease(printer, i + 1, gitFile);
 					}
 				}
 		} catch (IOException e) {

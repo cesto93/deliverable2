@@ -62,10 +62,10 @@ public class JIRATicketRetriever {
 					JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
 					
 					if (versions.length() == 0)
-						LOGGER.log(Level.WARNING, "missing affected version");
+						LOGGER.log(Level.WARNING, "missing affected version" + key);
 					
 					if (fixVersions.length() == 0)
-						LOGGER.log(Level.WARNING, "missing fixing version");
+						LOGGER.log(Level.WARNING, "missing fixing version" + key);
 
 					BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
 						tickets.add(bug);

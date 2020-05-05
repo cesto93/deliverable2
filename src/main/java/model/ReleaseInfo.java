@@ -42,5 +42,4 @@ public class ReleaseInfo {
 	public int compareDate(ReleaseInfo r) {
 		return this.date.compareTo(r.date);
 	}
-
 }

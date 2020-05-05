@@ -88,4 +88,29 @@ public class FileByReleaseController {
 		}
 	}
 	
+	public void setLocTouchedAndChurn(List<FileByRelease> files) {
+		int[] query;
+		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+		for (FileWithMetrics file: files.get(0).getFiles()) {
+			query = retriever.getLOCaddedAndDeleted(file.getName(), before);
+			int locTouched = query[0] + query[1];
+			int churn = query[0] - query[1];
+			file.setLocTouched(locTouched);
+			file.setChurn(churn);
+		}
+		
+		for (int i = 1; i < files.size() ; i++) {
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
+			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			for (FileWithMetrics file: files.get(i).getFiles()) {
+				query = retriever.getLOCaddedAndDeleted(file.getName(), before, after);
+				int locTouched = query[0] + query[1];
+				int churn = query[0] - query[1];
+				file.setLocTouched(locTouched);
+				file.setChurn(churn);
+			}
+		}
+		
+	}
+	
 }

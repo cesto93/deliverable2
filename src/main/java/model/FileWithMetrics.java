@@ -1,28 +1,31 @@
 package model;
 
-
+import model.CSVField.CSVFields;
 
 public class FileWithMetrics extends GitFile {
-	private boolean buggy;
 	private int loc;
 	private int nRevisions;
+	private int nFix;
 	private int nAuth;
-	
-	public enum CSVField {
-		VERSION,
-		FILENAME,
-	    BUGGY,
-	    LOC,
-	    NREVISIONS,
-	    NAUTH;
-	}
+	private int locAdded;
+	private int locTouched;
+	private int churn;
+	private int avgChurn;
+	private int age;
+	private boolean buggy;
 	
 	public FileWithMetrics(String name, String hash) {
 		super(name, hash);
-		this.buggy = false;
 		loc = -1;
+		setnFix(-1);
 		nRevisions = -1;
 		nAuth = -1;
+		setLocAdded(-1);
+		setLocTouched(-1);
+		setChurn(-1);
+		setAvgChurn(-1);
+		setAge(-1);
+		buggy = false;
 	}
 	
 	public boolean isBuggy() {
@@ -57,25 +60,76 @@ public class FileWithMetrics extends GitFile {
 		this.nAuth = nAuth;
 	}
 	
-	public static String getFieldName(CSVField field) {
-		 final String[] names =  {"Version", "File Name", "LOC", "NR", "NAuth",  "Buggy"};
-		 switch (field) {
-		 case VERSION: return names[0];
-		 case FILENAME: return names[1];
-		 case LOC: return names[2];
-		 case NREVISIONS: return names[3];
-		 case NAUTH: return names[4];
-		 case BUGGY: return names[5];
-		 
-		 default: return null;
-		 }
-	}
-	
 	public String getBuggyText() {
 		if (buggy)
 			return "YES";
 		else
 			return "NO";
+	}
+	
+	public Object getFieldValue(CSVFields field) {
+		switch(field) {
+		case AGE: return this.getAge();
+		case AVGCHURN: return this.getAvgChurn();
+		case BUGGY: return this.getBuggyText();
+		case CHURN: return this.getChurn();
+		case FILENAME: return this.getName();
+		case LOC: return this.getLOC();
+		case LOCADDED: return this.getLocAdded();
+		case LOCTOUCHED: return this.getLocTouched();
+		case NAUTH: return this.getnAuth();
+		case NFIX: return this.getnFix();
+		case NREVISIONS: return this.getnRevisions();
+		default: return null;
+		}
+	}
+
+	public int getnFix() {
+		return nFix;
+	}
+
+	public void setnFix(int nFix) {
+		this.nFix = nFix;
+	}
+
+	public int getLocAdded() {
+		return locAdded;
+	}
+
+	public void setLocAdded(int locAdded) {
+		this.locAdded = locAdded;
+	}
+
+	public int getLocTouched() {
+		return locTouched;
+	}
+
+	public void setLocTouched(int locTouched) {
+		this.locTouched = locTouched;
+	}
+
+	public int getAvgChurn() {
+		return avgChurn;
+	}
+
+	public void setAvgChurn(int avgChurn) {
+		this.avgChurn = avgChurn;
+	}
+
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	public int getChurn() {
+		return churn;
+	}
+
+	public void setChurn(int churn) {
+		this.churn = churn;
 	}
 
 }
