@@ -7,10 +7,11 @@ import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import exceptions.GitLogException;
 import model.GitFile;
 import model.FileWithMetrics;
 
@@ -85,7 +86,7 @@ public class GitLogRetriever {
 		BufferedReader stdError = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		while ((line = stdError.readLine()) != null)
 			bld.append(line);
-		throw new Exception(bld.toString());
+		throw new GitLogException(bld.toString());
 	}
 	
 	public LocalDate getCommitDate(String hash) {
@@ -93,9 +94,8 @@ public class GitLogRetriever {
 		try {
 			Process p =  getProcess("git", "show", NOPATCH, NONOTES, "--date=short", "--pretty=format:\"%cd\"", hash);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
 			
-			while ((line = stdInput.readLine()) != null) {
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 				res = LocalDate.parse(line.substring(1, line.length() - 1));
 			}
 			logErrors(p);
@@ -111,9 +111,7 @@ public class GitLogRetriever {
 		try {
 			Process p = getProcess(commands);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
-				
-			while ((line = stdInput.readLine()) != null) {
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 					commits.add(line.split(" ")[0]);
 			}
 			logErrors(p);
@@ -129,8 +127,7 @@ public class GitLogRetriever {
 	}
 	
 	public List<String> getCommitsHash(LocalDate before, LocalDate after) {
-		return getCommitsHashBase("git", "log", BEFORE + before.toString(), AFTER + after.toString(), 
-									ONELINE);
+		return getCommitsHashBase("git", "log", BEFORE + before.toString(), AFTER + after.toString(), ONELINE);
 	}
 	
 	public List<String> getCommitsHash(String key) {
@@ -138,17 +135,16 @@ public class GitLogRetriever {
 	}
 	
 	public List<GitFile> getFiles(String hash, String[] extTaken) {
-		TreeMap<String, GitFile> files = new TreeMap<>();	
+		TreeSet<GitFile> files = new TreeSet<>((GitFile a, GitFile b) -> a.compareName(b));
 		try {
+			
 			Process p = getProcess( "git", "ls-tree", "-r", hash);
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
-				
-			while ((line = stdInput.readLine()) != null) {
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));			
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 				if (endsWith(line, extTaken)) {
 					String fileHash = line.split(" ")[2].split("\t")[0];
 					String fileName = line.split("\t")[1];
-					files.put(fileName, new FileWithMetrics(fileName, fileHash));
+					files.add(new FileWithMetrics(fileName, fileHash));
 				}
 			}
 			logErrors(p);
@@ -156,17 +152,15 @@ public class GitLogRetriever {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				Thread.currentThread().interrupt();
 		}
-		return new ArrayList<>(files.values());
+		return new ArrayList<>(files);
 	}
 	
 	public List<String> getFilesModifiedByCommit(String hash, String[] extTaken) {
 		ArrayList<String> files = new ArrayList<>();
 		try {
 			Process p = getProcess( "git", "show", hash, "--name-only", ONELINE);
-			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			String line;
-				
-			while ((line = stdInput.readLine()) != null) {
+			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));	
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 				if (!line.contains(hash) && endsWith(line, extTaken))
 					files.add(line);
 			}
@@ -183,8 +177,7 @@ public class GitLogRetriever {
 		try {
 			Process p = getProcess("git", "cat-file", "-p", fileHash);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-				
-			while (stdInput.readLine() != null) {
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 					loc++;
 			}
 			logErrors(p);
@@ -198,10 +191,9 @@ public class GitLogRetriever {
 	private int getAuth(String ...cmd) {
 		int auth = 0;
 		try {
-			String line = null;
 			Process p = getProcess(cmd);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = stdInput.readLine()) != null) {
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 				if (line.length() != 0) {
 					auth++;
 				}
@@ -224,31 +216,27 @@ public class GitLogRetriever {
 	}
 	
 	private int getnRev(String ...cmd) {
-		int auth = 0;
+		int nRev = 0;
 		try {
-			String line = null;
 			Process p = getProcess(cmd);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = stdInput.readLine()) != null) {
-				if (line.length() != 0) {
-					auth += Integer.parseInt(line.split("\t")[0].trim());
-				}
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
+				nRev++;
 			}
 			logErrors(p);
 		} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 				Thread.currentThread().interrupt();
 		}
-		return auth;
+		return nRev;
 	}
 	
 	public int getnRev(String filename, LocalDate before) {
-		return getnRev("git", SHORTLOG, MASTER,  "-n", "-s", BEFORE + before.toString() , "--", filename );
+		return getnRev("git","log",  ONELINE, BEFORE + before.toString() , "--", filename );
 	}
 	
 	public int getnRev(String filename, LocalDate before, LocalDate after) {
-		return getnRev("git", SHORTLOG, MASTER, "-n", "-s", BEFORE + before.toString(), AFTER + after.toString(),
-						 "--", filename);
+		return getnRev("git", "log", ONELINE, BEFORE + before.toString(), AFTER + after.toString(), "--", filename);
 	}
 	
 	public int[] getLOCaddedAndDeleted(String ...cmd) {
@@ -256,11 +244,10 @@ public class GitLogRetriever {
 		int added = 0;
 		int deleted = 0;
 		try {
-			String line = null;
 			Process p = getProcess(cmd);
 			BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = stdInput.readLine()) != null) {
-				if (line.length() != 0 && line.contains("\t") ) {
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
+				if (line.contains("\t") ) {
 					String[] parsed = line.split("\t");
 					added += Integer.parseInt(parsed[0]);
 					deleted += Integer.parseInt(parsed[1]);
@@ -277,11 +264,11 @@ public class GitLogRetriever {
 	}
 	
 	public int[] getLOCaddedAndDeleted(String filename, LocalDate before) {
-		return this.getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before.toString(), "--", filename);
+		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before.toString(), "--", filename);
 	}
 	
 	public int[] getLOCaddedAndDeleted(String filename, LocalDate before, LocalDate after) {
-		return this.getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before.toString(), 
+		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before.toString(), 
 											AFTER + after.toString(), "--", filename);
 	}
 }

@@ -30,7 +30,7 @@ public class FileByRelease {
 		this.files = files;
 	}
 	
-	public List<?> getFieldsValues(int nRel, int  nfile, CSVFields[] fields) {
+	public List<Object> getFieldsValues(int nRel, int  nfile, CSVFields[] fields) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.add(nRel);
 		for (int i = 1; i < fields.length; i++)

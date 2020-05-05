@@ -26,7 +26,7 @@ public class CSVField {
 		throw new IllegalStateException("Utility class");
 	}
 	
-	public static Iterable<?> getFieldsName(CSVFields[] fields) {
+	public static Iterable<String> getFieldsName(CSVFields[] fields) {
 		ArrayList<String> res = new ArrayList<>();
 		for (CSVFields field : fields) {
 			res.add(getFieldName(field));

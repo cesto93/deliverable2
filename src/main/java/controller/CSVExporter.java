@@ -51,7 +51,6 @@ public class CSVExporter {
 		    	for (int i = 0; i < files.size(); i++) {
 					for (int j = 0; j < files.get(i).getFiles().size(); j++) {
 						printer.printRecord(files.get(i).getFieldsValues(i + 1, j, fields));
-						//printGitFileByRelease(printer, i + 1, gitFile);
 					}
 				}
 		} catch (IOException e) {
