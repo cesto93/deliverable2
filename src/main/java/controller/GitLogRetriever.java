@@ -78,7 +78,7 @@ public class GitLogRetriever {
 		return false;
 	}
 	
-	private static void logErrors(Process p) throws Exception  {
+	private static void logErrors(Process p) throws GitLogException, IOException, InterruptedException  {
 		if (p.waitFor() == 0)
 			return;
 		StringBuilder bld = new StringBuilder();
