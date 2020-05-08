@@ -7,4 +7,4 @@ addons:
     organization: "cesto93"
     token: $SONAR_TOKEN
 script:
-  - mvn clean verify install sonar:sonar -Pcoverage -Dsonar.projectKey=$PROJECT_KEY -Dsonar.language=java -Dsonar.sources=src -Dsonar.java.binaries=.
+  - mvn clean verify install sonar:sonar -Pcoverage -Dsonar.projectKey=$PROJECT_KEY -Dsonar.java.binaries=.
