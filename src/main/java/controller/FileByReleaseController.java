@@ -14,6 +14,7 @@ import model.GitCommit;
 import model.GitFile;
 import model.FileWithMetrics;
 import model.Release;
+import utils.AddMap;
 
 public class FileByReleaseController {
 	private GitLogRetriever retriever;
@@ -89,29 +90,70 @@ public class FileByReleaseController {
 	}
 	
 	private void setnRevisions(FileByRelease fbr) {
-			HashMap<String, Integer> rev = new HashMap<>();
-			for (GitCommit commit : fbr.getRelease().getCommits()) {
-				for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
-					Integer n = rev.get(fileName);
-					if (n == null)
-						rev.put(fileName, 1);
-					else
-						rev.put(fileName, n + 1);
-				}
+		HashMap<String, Integer> rev = new HashMap<>();
+		for (GitCommit commit : fbr.getRelease().getCommits()) {
+			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
+				AddMap.sumValuesInMap(rev, fileName, 1);
 			}
-			for (FileWithMetrics file : fbr.getFiles()) {
-				Integer n = rev.get(file.getName());
-				if (n == null)
-					file.setnRevisions(0);
-				else
-					file.setnRevisions(n);
-			}
+		}
+		for (FileWithMetrics file : fbr.getFiles()) {
+			file.setnRevisions(AddMap.getValuesInMap(rev, file.getName()));
+		}
 	}
 	
 	public void setnRevisions(List<FileByRelease> fbr) {
 		for (FileByRelease filesInRel : fbr) {
 			setnRevisions(filesInRel);
 		}
+	}
+	
+	private void setLocTouchedAndChurn(FileByRelease fbr) {
+		HashMap<String, Integer> touched = new HashMap<>();
+		HashMap<String, Integer> churn = new HashMap<>();
+		for (GitCommit commit : fbr.getRelease().getCommits()) {
+			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
+				int[] query = retriever.getLOCaddedAndDeleted(fileName, commit.getHash());
+				int incTouched = query[0] + query[1];
+				int incChurn = query[0] - query[1];
+				AddMap.sumValuesInMap(touched, fileName, incTouched);
+				AddMap.sumValuesInMap(churn, fileName, incChurn);
+			}
+		}
+		for (FileWithMetrics file : fbr.getFiles()) {
+			file.setLocTouched(AddMap.getValuesInMap(touched, file.getName()));
+			file.setChurn(AddMap.getValuesInMap(churn, file.getName()));
+		}
+	}
+	
+	public void setLocTouchedAndChurn(List<FileByRelease> fbr) {
+		for (FileByRelease filesInRel : fbr) {
+			setLocTouchedAndChurn(filesInRel);
+		}
+	}
+	
+	public void setLocTouchedAndChurnSlow(List<FileByRelease> files) {
+		int[] query;
+		String before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+		for (FileWithMetrics file: files.get(0).getFiles()) {
+			query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before);
+			int locTouched = query[0] + query[1];
+			int churn = query[0] - query[1];
+			file.setLocTouched(locTouched);
+			file.setChurn(churn);
+		}
+		
+		for (int i = 1; i < files.size() ; i++) {
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+			String after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+			for (FileWithMetrics file: files.get(i).getFiles()) {
+				query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before, after);
+				int locTouched = query[0] + query[1];
+				int churn = query[0] - query[1];
+				file.setLocTouched(locTouched);
+				file.setChurn(churn);
+			}
+		}
+		
 	}
 	
 	public void setnRevisionsSlow(List<FileByRelease> files) {
@@ -142,31 +184,6 @@ public class FileByReleaseController {
 				file.setnAuth(retriever.getNAuthByDate(file.getName(), before, after));
 			}
 		}
-	}
-	
-	public void setLocTouchedAndChurn(List<FileByRelease> files) {
-		int[] query;
-		String before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
-		for (FileWithMetrics file: files.get(0).getFiles()) {
-			query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before);
-			int locTouched = query[0] + query[1];
-			int churn = query[0] - query[1];
-			file.setLocTouched(locTouched);
-			file.setChurn(churn);
-		}
-		
-		for (int i = 1; i < files.size() ; i++) {
-			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
-			String after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
-			for (FileWithMetrics file: files.get(i).getFiles()) {
-				query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before, after);
-				int locTouched = query[0] + query[1];
-				int churn = query[0] - query[1];
-				file.setLocTouched(locTouched);
-				file.setChurn(churn);
-			}
-		}
-		
 	}
 	
 }

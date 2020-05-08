@@ -33,8 +33,27 @@ public class JIRATicketRetriever {
 		return list.toArray(new String[0]);
 	}
 	
-	public static BugTicket[] getTicketKeysAndVersion(String projName) {
-		Integer j = 0;
+	private static void addTickets(JSONArray issues, Integer start, Integer end, 
+								ArrayList<BugTicket> tickets) {
+	for (int i = start; i < end; i++) {
+		JSONObject issue = issues.getJSONObject(i%1000);
+		String key = issue.get("key").toString();
+		JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
+		JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
+		
+		if (LOGGER.isLoggable(Level.WARNING)) {
+			if (versions.length() == 0)
+				LOGGER.warning(String.format("missing affected version %s", key));
+		
+			if (fixVersions.length() == 0)
+				LOGGER.warning(String.format("missing fixing version %s", key));
+		}
+		BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
+		tickets.add(bug);
+	} 
+	}
+	
+	public static BugTicket[] getBugTicket(String projName) {
 		Integer i = 0;
 		Integer total = 1;
 		ArrayList<BugTicket> tickets = new ArrayList<>();
@@ -42,7 +61,7 @@ public class JIRATicketRetriever {
 		//Get JSON API for closed bugs w/ AV in the project
 		do {
 			//Only gets a max of 1000 at a time, so must do this multiple times if res >1000
-			j = i + 1000;
+			Integer j = i + 1000;
 			String url = BASEURL + "/search?jql=project=%22" + projName 
 					+ "%22AND%22issueType%22=%22Bug%22" + "AND(%22status%22=%22closed%22OR"
 					+ "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22" 
@@ -55,23 +74,11 @@ public class JIRATicketRetriever {
 				total = json.getInt("total");
 				
 				//Iterate through each res
-				for (; i < total && i < j; i++) {
-					JSONObject issue = issues.getJSONObject(i%1000);
-					String key = issue.get("key").toString();
-					JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
-					JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
-					
-					if (LOGGER.isLoggable(Level.WARNING)) {
-						if (versions.length() == 0)
-							LOGGER.warning(String.format("missing affected version %s", key));
-					
-						if (fixVersions.length() == 0)
-							LOGGER.warning(String.format("missing fixing version %s", key));
-					}
-
-					BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
-						tickets.add(bug);
-				} 
+				if (j > total)
+					addTickets(issues, i, total, tickets);
+				else
+					addTickets(issues, i, j, tickets);
+				i += 1000;
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} 

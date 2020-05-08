@@ -58,8 +58,8 @@ public class Start {
 		LOGGER.log(Level.INFO, "Done setNRev");
 		fbrController.setnAuth(files);
 		LOGGER.log(Level.INFO, "Done setNAuth");
-		//fbrController.setLocTouchedAndChurn(files);
-		//LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
+		fbrController.setLocTouchedAndChurn(files);
+		LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
 		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");

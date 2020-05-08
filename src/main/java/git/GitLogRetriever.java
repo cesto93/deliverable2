@@ -209,6 +209,10 @@ public class GitLogRetriever {
 		return res;
 	}
 	
+	public int[] getLOCaddedAndDeleted(String filename, String hash) {
+		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, hash, "--", filename);
+	}
+	
 	public int[] getLOCaddedAndDeletedByDate(String filename, String before) {
 		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before, "--", filename);
 	}

@@ -39,7 +39,7 @@ public class BugTicketRepository {
 	}
 	
 	public BugTicket[] getBugTicket(String projName) {
-		BugTicket[] tickets = JIRATicketRetriever.getTicketKeysAndVersion(projName);
+		BugTicket[] tickets = JIRATicketRetriever.getBugTicket(projName);
 		for (BugTicket ticket : tickets) {
 		ticket.setFileNames(getFileModified(getGitCommits(ticket)));
 		}
