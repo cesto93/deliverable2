@@ -3,8 +3,8 @@ package controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
+import git.GitLogRetriever;
 import model.BugTicket;
 import model.GitCommit;
 import model.Release;
@@ -19,24 +19,25 @@ public class ReleaseController {
 	
 	public Release[] getRelease(ReleaseInfo[] relInfo, BugTicket[] bugs) {	
 		Release[] releases = new Release[relInfo.length];
+		GitCommit[] commits = getCommits(retriever.getCommitsHashByDate(relInfo[0].getDate().toLocalDate().toString()));
+		releases[0] = new Release(relInfo[0], commits, getBugByRelease(relInfo[0], bugs));
 		
-		releases[0] = new Release(relInfo[0], getCommits(retriever.getCommitsHash(relInfo[0].getDate().toLocalDate())), 
-											getBugByRelease(relInfo[0], bugs));
 		for (int i = 1; i < relInfo.length; i++) {
-			LocalDate after = relInfo[i - 1].getDate().toLocalDate();
-			LocalDate before = relInfo[i].getDate().toLocalDate();
-			releases[i] = new Release(relInfo[i], getCommits(retriever.getCommitsHash(before, after)), 
-										getBugByRelease(relInfo[i], bugs));
+			String after = relInfo[i - 1].getDate().toLocalDate().toString();
+			String before = relInfo[i].getDate().toLocalDate().toString();
+			commits = getCommits(retriever.getCommitsHashByDate(before, after));
+			releases[i] = new Release(relInfo[i], commits, getBugByRelease(relInfo[i], bugs));
 		}
 		return releases;
 	}
 	
 	private GitCommit[] getCommits(List<String> hashes) {
-		TreeSet<GitCommit> commits = new TreeSet<>(GitCommit.getComparator());
+		List<GitCommit> commits = new ArrayList<>();
 		for (String hash : hashes) {
 			LocalDate date = retriever.getCommitDate(hash);
 			commits.add(new GitCommit(hash, date));
 		}
+		
 		return commits.toArray(new GitCommit[0]);
 	}
 	

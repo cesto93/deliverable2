@@ -1,4 +1,4 @@
-package controller;
+package jira;
 
 import java.io.IOException;
 import java.time.LocalDate;

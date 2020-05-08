@@ -1,7 +1,8 @@
-package controller;
+package exporter;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,6 +12,7 @@ import org.apache.commons.csv.CSVPrinter;
 
 import model.CSVField;
 import model.FileByRelease;
+import model.FileWithMetrics;
 import model.ReleaseInfo;
 import model.CSVField.CSVFields;
 
@@ -40,7 +42,15 @@ public class CSVExporter {
 		}
 	}
 	
-	public static void printGitFileByRelease(List<FileByRelease> files, String file) {
+	public static List<Object> getFieldsValues(int nRel, FileWithMetrics file, CSVFields[] fields) {
+		ArrayList<Object> res = new ArrayList<>();
+		res.add(nRel);
+		for (int i = 1; i < fields.length; i++)
+			res.add(file.getFieldValue(fields[i]));
+		return res;
+	}
+	
+	public static void printGitFileByRelease(List<FileByRelease> fbr, String file) {
 		
 		try (
 				FileWriter fw = new FileWriter(file);
@@ -48,9 +58,9 @@ public class CSVExporter {
 			) {
 				printer.printRecord(CSVField.getFieldsName(fields));
 		    	
-		    	for (int i = 0; i < files.size(); i++) {
-					for (int j = 0; j < files.get(i).getFiles().size(); j++) {
-						printer.printRecord(files.get(i).getFieldsValues(i + 1, j, fields));
+		    	for (int i = 0; i < fbr.size(); i++) {
+					for (FileWithMetrics fwm : fbr.get(i).getFiles()) {
+						printer.printRecord(getFieldsValues(i + 1, fwm, fields));
 					}
 				}
 		} catch (IOException e) {

@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import exporter.CSVExporter;
+import git.GitLogRetriever;
+import git.GitRepoHandler;
+import jira.JIRATicketRetriever;
 import model.BugTicket;
 import model.FileByRelease;
 import model.ReleaseInfo;
@@ -24,7 +28,7 @@ public class Start {
 										GetProperty.getProperty("repoDir"));
 		//ZOOKEEPER
 		
-		GitLogRetriever retriever = new GitLogRetriever(urlProj, repoPathProj);
+		GitLogRetriever retriever = new GitLogRetriever(new GitRepoHandler(urlProj, repoPathProj));
 		BugTicketRepository gitController = new BugTicketRepository(retriever, extTaken);
 		ReleaseController relController = new ReleaseController(retriever);
 		FileByReleaseController fbrController = new FileByReleaseController(retriever, extTaken);
@@ -54,8 +58,8 @@ public class Start {
 		LOGGER.log(Level.INFO, "Done setNRev");
 		fbrController.setnAuth(files);
 		LOGGER.log(Level.INFO, "Done setNAuth");
-		fbrController.setLocTouchedAndChurn(files);
-		LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
+		//fbrController.setLocTouchedAndChurn(files);
+		//LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
 		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");

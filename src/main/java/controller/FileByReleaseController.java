@@ -1,10 +1,13 @@
 package controller;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
+import git.GitLogRetriever;
 import model.BugTicket;
 import model.FileByRelease;
 import model.GitCommit;
@@ -27,8 +30,8 @@ public class FileByReleaseController {
 			TreeSet<FileWithMetrics> filesInRel = new TreeSet<>(
 													(FileWithMetrics c, FileWithMetrics d) -> c.compareName(d));
 			FileByRelease byRelease = new FileByRelease(release);
-			GitCommit last;
-			if ((last = release.getLastCommit()) != null ) {
+			GitCommit last = release.getLastCommit();
+			if (last != null ) {
 				for (GitFile file : retriever.getFiles(last.getHash(), extTaken)) {
 					filesInRel.add(new FileWithMetrics(file.getName(), file.getHash()));
 				}
@@ -58,41 +61,94 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public void setnAuth(List<FileByRelease> files) {
-		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+	public void setnAuth(FileByRelease fbr) {
+		HashMap<String, Set<String>> authsByFile = new HashMap<>();
+		for (GitCommit commit : fbr.getRelease().getCommits()) {
+			String auth = retriever.getAuthor(commit.getHash());
+			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
+				Set<String> auths = authsByFile.get(fileName);
+				if (auths == null)
+					auths = new HashSet<>();
+				auths.add(auth);
+				authsByFile.put(fileName, auths);
+			}
+		}
+		for (FileWithMetrics file : fbr.getFiles()) {
+			Set<String> auths = authsByFile.get(file.getName());
+			if (auths == null)
+				file.setnAuth(0);
+			else
+				file.setnAuth(auths.size());
+		}
+	}
+	
+	public void setnAuth(List<FileByRelease> fbr) {
+		for (FileByRelease filesInRel : fbr) {
+			setnAuth(filesInRel);
+		}
+	}
+	
+	private void setnRevisions(FileByRelease fbr) {
+			HashMap<String, Integer> rev = new HashMap<>();
+			for (GitCommit commit : fbr.getRelease().getCommits()) {
+				for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
+					Integer n = rev.get(fileName);
+					if (n == null)
+						rev.put(fileName, 1);
+					else
+						rev.put(fileName, n + 1);
+				}
+			}
+			for (FileWithMetrics file : fbr.getFiles()) {
+				Integer n = rev.get(file.getName());
+				if (n == null)
+					file.setnRevisions(0);
+				else
+					file.setnRevisions(n);
+			}
+	}
+	
+	public void setnRevisions(List<FileByRelease> fbr) {
+		for (FileByRelease filesInRel : fbr) {
+			setnRevisions(filesInRel);
+		}
+	}
+	
+	public void setnRevisionsSlow(List<FileByRelease> files) {
+		String before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 		for (FileWithMetrics file: files.get(0).getFiles()) {
-			file.setnAuth(retriever.getAuth(file.getName(), before));
+			file.setnRevisions(retriever.getnRevByDate(file.getName(), before));
 		}
 		
 		for (int i = 1; i < files.size() ; i++) {
-			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
-			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+			String after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 			for (FileWithMetrics file: files.get(i).getFiles()) {
-				file.setnAuth(retriever.getAuth(file.getName(), before, after));
+				file.setnRevisions(retriever.getnRevByDate(file.getName(), before, after));
 			}
 		}
 	}
 	
-	public void setnRevisions(List<FileByRelease> files) {
-		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+	public void setnAuthSlow(List<FileByRelease> files) {
+		String before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 		for (FileWithMetrics file: files.get(0).getFiles()) {
-			file.setnRevisions(retriever.getnRev(file.getName(), before));
+			file.setnAuth(retriever.getNAuthByDate(file.getName(), before));
 		}
 		
 		for (int i = 1; i < files.size() ; i++) {
-			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
-			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+			String after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 			for (FileWithMetrics file: files.get(i).getFiles()) {
-				file.setnRevisions(retriever.getnRev(file.getName(), before, after));
+				file.setnAuth(retriever.getNAuthByDate(file.getName(), before, after));
 			}
 		}
 	}
 	
 	public void setLocTouchedAndChurn(List<FileByRelease> files) {
 		int[] query;
-		LocalDate before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate();
+		String before = files.get(0).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 		for (FileWithMetrics file: files.get(0).getFiles()) {
-			query = retriever.getLOCaddedAndDeleted(file.getName(), before);
+			query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before);
 			int locTouched = query[0] + query[1];
 			int churn = query[0] - query[1];
 			file.setLocTouched(locTouched);
@@ -100,10 +156,10 @@ public class FileByReleaseController {
 		}
 		
 		for (int i = 1; i < files.size() ; i++) {
-			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate();
-			LocalDate after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate();
+			before = files.get(i).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
+			String after = files.get(i - 1).getRelease().getReleaseInfo().getDate().toLocalDate().toString();
 			for (FileWithMetrics file: files.get(i).getFiles()) {
-				query = retriever.getLOCaddedAndDeleted(file.getName(), before, after);
+				query = retriever.getLOCaddedAndDeletedByDate(file.getName(), before, after);
 				int locTouched = query[0] + query[1];
 				int churn = query[0] - query[1];
 				file.setLocTouched(locTouched);

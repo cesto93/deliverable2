@@ -35,7 +35,7 @@ public class Release {
 	public GitCommit getLastCommit() {
 		if (this.getCommits().length == 0)
 			return null;
-		return this.getCommits()[this.getCommits().length - 1];
+		return this.getCommits()[0];
 	}
 	
 }

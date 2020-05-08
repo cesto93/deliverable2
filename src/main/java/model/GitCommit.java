@@ -1,7 +1,6 @@
 package model;
 
 import java.time.LocalDate;
-import java.util.Comparator;
 
 public class GitCommit  {
 	private String hash;
@@ -35,10 +34,6 @@ public class GitCommit  {
 
 	public void setDate(LocalDate date) {
 		this.date = date;
-	}
-
-	public static Comparator<GitCommit> getComparator() {
-		return (GitCommit a, GitCommit b) ->  a.getDate().compareTo(b.getDate());
 	}
 	
 }

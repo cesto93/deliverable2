@@ -3,8 +3,9 @@ package controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
+import git.GitLogRetriever;
+import jira.JIRATicketRetriever;
 import model.BugTicket;
 import model.GitCommit;
 
@@ -20,7 +21,7 @@ public class BugTicketRepository {
 	
 	private List<GitCommit> getGitCommits(BugTicket ticket) {	
 		List<String> hashes = retriever.getCommitsHash(ticket.getKey());
-		TreeSet<GitCommit> temp = new TreeSet<>(GitCommit.getComparator());
+		ArrayList<GitCommit> temp = new ArrayList<>();
 		for (String hash : hashes) {
 			LocalDate date = retriever.getCommitDate(hash);
 			temp.add(new GitCommit(hash, date));
