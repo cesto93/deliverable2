@@ -155,11 +155,16 @@ public class FileByReleaseController {
 	}
 	
 	public void setAge(List<FileByRelease> fbr) {
+		HashMap<String, LocalDate> creationDates = new HashMap<>();
 		for (FileByRelease filesInRel : fbr) {
 			for (FileWithMetrics file :filesInRel.getFiles()) {
-				LocalDate creation = retriever.getFileDate(file.getName());
+				LocalDate creationDate = creationDates.get(file.getName());
+				if (creationDate == null) {
+					creationDate = retriever.getFileDate(file.getName());
+					creationDates.put(file.getName(), creationDate);
+				}
 				LocalDate releaseDate = filesInRel.getRelease().getReleaseInfo().getDate().toLocalDate();
-				long age = creation.until(releaseDate, ChronoUnit.WEEKS);
+				long age = creationDate.until(releaseDate, ChronoUnit.WEEKS);
 				file.setAge((int) age);
 			}
 		}

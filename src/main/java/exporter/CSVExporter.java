@@ -14,14 +14,13 @@ import model.CSVField;
 import model.FileByRelease;
 import model.FileWithMetrics;
 import model.ReleaseInfo;
-import model.CSVField.CSVFields;
 
 public class CSVExporter {
 	
 	private static final Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
-	private static final CSVFields[] fields = new CSVFields[]{ CSVFields.VERSION, CSVFields.FILENAME, 
-					CSVFields.LOC, CSVFields.LOCTOUCHED, CSVFields.NREVISIONS, CSVFields.NAUTH, CSVFields.LOCADDED, 
-					CSVFields.AVGLOCADDED, CSVFields.CHURN, CSVFields.AVGCHURN, CSVFields.AGE, CSVFields.BUGGY};
+	private static final CSVField[] fields = new CSVField[]{ CSVField.VERSION, CSVField.FILENAME, 
+					CSVField.LOC, CSVField.LOCTOUCHED, CSVField.NREVISIONS, CSVField.NAUTH, CSVField.LOCADDED, 
+					CSVField.AVGLOCADDED, CSVField.CHURN, CSVField.AVGCHURN, CSVField.AGE, CSVField.BUGGY};
 	
 	private CSVExporter() {
 	    throw new IllegalStateException("Utility class");
@@ -43,7 +42,7 @@ public class CSVExporter {
 		}
 	}
 	
-	public static List<Object> getFieldsValues(int nRel, FileWithMetrics file, CSVFields[] fields) {
+	public static List<Object> getFieldsValues(int nRel, FileWithMetrics file, CSVField[] fields) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.add(nRel);
 		for (int i = 1; i < fields.length; i++)

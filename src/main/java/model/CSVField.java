@@ -2,11 +2,8 @@ package model;
 
 import java.util.ArrayList;
 
-public class CSVField {
-	private static final String[] names =  {"Version", "File Name", "Buggy", "LOC", "NR", "NFix", "NAuth", "LOC_touched",
-											"Churn", "Age", "AVG_Churn", "LOC_added", "AVG_LOC_added"};
+public enum CSVField {
 	
-	public enum CSVFields {
 		VERSION,
 		FILENAME,
 	    BUGGY,
@@ -20,21 +17,22 @@ public class CSVField {
 	    AVGCHURN,
 	    LOCADDED,
 	    AVGLOCADDED;
-	}
-	
-	public CSVField() {
-		throw new IllegalStateException("Utility class");
-	}
-	
-	public static Iterable<String> getFieldsName(CSVFields[] fields) {
-		ArrayList<String> res = new ArrayList<>();
-		for (CSVFields field : fields) {
-			res.add(getFieldName(field));
+		
+		private static final String[] names =  {"Version", "File Name", "Buggy", "LOC", "NR", "NFix", "NAuth", "LOC_touched",
+				"Churn", "Age", "AVG_Churn", "LOC_added", "AVG_LOC_added"};
+		
+		 @Override
+		 public String toString() {
+		    return names[this.ordinal()];
+		 }
+		 
+		 public static Iterable<String> getFieldsName(CSVField[] fields) {
+				ArrayList<String> res = new ArrayList<>();
+				for (CSVField field : fields) {
+					res.add(field.toString());
+				}
+				return res;
 		}
-		return res;
-	}
-	
-	public static String getFieldName(CSVFields field) {
-		return names[field.ordinal()];
-	}
 }
+	
+	
