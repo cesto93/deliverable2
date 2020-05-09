@@ -53,13 +53,18 @@ public class Start {
 		LOGGER.log(Level.INFO, "Done getting file by release");
 		
 		fbrController.setLoc(files);
-		LOGGER.log(Level.INFO, "Done setLOC");
+		LOGGER.log(Level.INFO, "Done set LOC");
 		fbrController.setnRevisions(files);
-		LOGGER.log(Level.INFO, "Done setNRev");
+		LOGGER.log(Level.INFO, "Done set nRev");
 		fbrController.setnAuth(files);
-		LOGGER.log(Level.INFO, "Done setNAuth");
+		LOGGER.log(Level.INFO, "Done set nAuth");
 		fbrController.setLocTouchedAndChurn(files);
-		LOGGER.log(Level.INFO, "Done setTouchedAndChurn");
+		LOGGER.log(Level.INFO, "Done set touchedAndChurn");
+		fbrController.setAvgMetrics(files);
+		LOGGER.log(Level.INFO, "Done set AVGChurn and AVGLocAdded");
+		fbrController.setAge(files);
+		LOGGER.log(Level.INFO, "Done set Age");
+		
 		FileByReleaseController.setFileBuggy(files);
 		LOGGER.log(Level.INFO, "Done setFileBuggy");
 		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");

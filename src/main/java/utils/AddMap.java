@@ -1,6 +1,6 @@
 package utils;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class AddMap {
 	
@@ -8,7 +8,7 @@ public class AddMap {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	public static void sumValuesInMap(HashMap<String, Integer> map, String key, int inc) {
+	public static void sumValuesInMap(Map<String, Integer> map, String key, int inc) {
 		Integer actual = map.get(key);
 		if (actual == null)
 			map.put(key, inc);
@@ -16,7 +16,7 @@ public class AddMap {
 			map.put(key, actual + inc);
 	}
 	
-	public static int getValuesInMap(HashMap<String, Integer> map, String key) {
+	public static int getValuesInMap(Map<String, Integer> map, String key) {
 		Integer value = map.get(key);
 		if (value == null)
 			return 0;

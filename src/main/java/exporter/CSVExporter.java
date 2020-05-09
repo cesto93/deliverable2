@@ -20,7 +20,8 @@ public class CSVExporter {
 	
 	private static final Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
 	private static final CSVFields[] fields = new CSVFields[]{ CSVFields.VERSION, CSVFields.FILENAME, 
-			CSVFields.LOC, CSVFields.LOCTOUCHED, CSVFields.NREVISIONS, CSVFields.NAUTH, CSVFields.CHURN, CSVFields.BUGGY};
+					CSVFields.LOC, CSVFields.LOCTOUCHED, CSVFields.NREVISIONS, CSVFields.NAUTH, CSVFields.LOCADDED, 
+					CSVFields.AVGLOCADDED, CSVFields.CHURN, CSVFields.AVGCHURN, CSVFields.AGE, CSVFields.BUGGY};
 	
 	private CSVExporter() {
 	    throw new IllegalStateException("Utility class");

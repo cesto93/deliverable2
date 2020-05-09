@@ -1,5 +1,7 @@
 package controller;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +48,7 @@ public class FileByReleaseController {
 	public void setLoc(List<FileByRelease> files) {
 		for (FileByRelease filesInRel : files) {
 			for (FileWithMetrics file : filesInRel.getFiles())
-				file.setLOC(retriever.getLOC(file.getHash()));
+				file.setLoc(retriever.getLOC(file.getHash()));
 		}
 	}
 	
@@ -108,18 +110,22 @@ public class FileByReleaseController {
 	}
 	
 	private void setLocTouchedAndChurn(FileByRelease fbr) {
+		HashMap<String, Integer> added = new HashMap<>();
 		HashMap<String, Integer> touched = new HashMap<>();
 		HashMap<String, Integer> churn = new HashMap<>();
 		for (GitCommit commit : fbr.getRelease().getCommits()) {
 			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
 				int[] query = retriever.getLOCaddedAndDeleted(fileName, commit.getHash());
+				int incAdded = query[0];
 				int incTouched = query[0] + query[1];
 				int incChurn = query[0] - query[1];
+				AddMap.sumValuesInMap(added, fileName, incAdded);
 				AddMap.sumValuesInMap(touched, fileName, incTouched);
 				AddMap.sumValuesInMap(churn, fileName, incChurn);
 			}
 		}
 		for (FileWithMetrics file : fbr.getFiles()) {
+			file.setLocAdded(AddMap.getValuesInMap(added, file.getName()));
 			file.setLocTouched(AddMap.getValuesInMap(touched, file.getName()));
 			file.setChurn(AddMap.getValuesInMap(churn, file.getName()));
 		}
@@ -128,6 +134,34 @@ public class FileByReleaseController {
 	public void setLocTouchedAndChurn(List<FileByRelease> fbr) {
 		for (FileByRelease filesInRel : fbr) {
 			setLocTouchedAndChurn(filesInRel);
+		}
+	}
+	
+	//needs nRevision, Churn, LocAdded to be setted
+	public void setAvgMetrics(List<FileByRelease> fbr) {
+		for (FileByRelease filesInRel : fbr) {
+			for (FileWithMetrics file :filesInRel.getFiles()) {
+				if (file.getnRevisions() != 0) {
+					file.setAvgChurn(file.getChurn() / file.getnRevisions());
+					file.setAvgLocAdded((file.getLocAdded() / file.getnRevisions()));
+				}
+				else
+				{
+					file.setAvgChurn(0);
+					file.setAvgLocAdded(0);
+				}
+			}
+		}
+	}
+	
+	public void setAge(List<FileByRelease> fbr) {
+		for (FileByRelease filesInRel : fbr) {
+			for (FileWithMetrics file :filesInRel.getFiles()) {
+				LocalDate creation = retriever.getFileDate(file.getName());
+				LocalDate releaseDate = filesInRel.getRelease().getReleaseInfo().getDate().toLocalDate();
+				long age = creation.until(releaseDate, ChronoUnit.WEEKS);
+				file.setAge((int) age);
+			}
 		}
 	}
 	

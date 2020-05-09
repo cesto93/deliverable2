@@ -23,6 +23,7 @@ public class GitLogRetriever {
 	private static final String NOPATCH = "--no-patch";
 	private static final String NONOTES = "--no-notes";
 	private static final String NAMEONLY = "--name-only";
+	private static final String SHORTDATE = "--date=short";
 	
 	private GitDataProvider dataProvider;
 	
@@ -47,7 +48,7 @@ public class GitLogRetriever {
 		LocalDate res = null;
 		try {
 			BufferedReader stdInput =  dataProvider.getResultStream("git", "show", NOPATCH, NONOTES, 
-													"--date=short", "--pretty=format:'%cd'", hash);
+										SHORTDATE, "--pretty=format:'%cd'", hash);
 			
 			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
 				res = LocalDate.parse(line.substring(1, line.length() - 1));
@@ -210,7 +211,7 @@ public class GitLogRetriever {
 	}
 	
 	public int[] getLOCaddedAndDeleted(String filename, String hash) {
-		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, hash, "--", filename);
+		return getLOCaddedAndDeleted("git", "show", NUMSTAT, ONELINE, hash, "--", filename);
 	}
 	
 	public int[] getLOCaddedAndDeletedByDate(String filename, String before) {
@@ -220,5 +221,22 @@ public class GitLogRetriever {
 	public int[] getLOCaddedAndDeletedByDate(String filename, String before, String after) {
 		return getLOCaddedAndDeleted("git", "log", NUMSTAT, ONELINE, BEFORE + before, 
 											AFTER + after, "--", filename);
+	}
+	
+	public LocalDate getFileDate(String filename) {
+		LocalDate res = null;
+		try {
+			BufferedReader stdInput =  dataProvider.getResultStream("git", "log" ,"--diff-filter=A", 
+										"--follow", SHORTDATE, "--format=%cd", "-1", "--", filename);
+			
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
+				res = LocalDate.parse(line);
+			}
+		} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return res;
+
 	}
 }
