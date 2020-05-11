@@ -29,15 +29,15 @@ public class TestFileByReleaseController {
 		commits[1] = new GitCommit("bbb");
 		commits[2] = new GitCommit("ccc");
 		
-		ArrayList<String>[] filesByCommit = new ArrayList[3];
-		for (int i = 0; i < filesByCommit.length; i++) {
-			filesByCommit[i] = new ArrayList<>();
+		List<List<String>> filesByCommit = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			filesByCommit.add(new ArrayList<>());
 		}
-		filesByCommit[0].add("aaa.java");
-		filesByCommit[0].add("bbb.java");
-		filesByCommit[1].add("ccc.java");
-		filesByCommit[2].add("aaa.java");
-		filesByCommit[2].add("bbb.java");
+		filesByCommit.get(0).add("aaa.java");
+		filesByCommit.get(0).add("bbb.java");
+		filesByCommit.get(1).add("ccc.java");
+		filesByCommit.get(2).add("aaa.java");
+		filesByCommit.get(2).add("bbb.java");
 		
 		List<FileWithMetrics> fwm = new ArrayList<>();
 		fwm.add(new FileWithMetrics("aaa.java", "aaaa"));
@@ -52,9 +52,9 @@ public class TestFileByReleaseController {
 		fbrs.add(fbr);
 		
 		GitLogRetriever retriever = Mockito.mock(GitLogRetriever.class);
-		Mockito.when(retriever.getFilesModifiedByCommit("aaa", extTaken)).thenReturn(filesByCommit[0]);
-		Mockito.when(retriever.getFilesModifiedByCommit("bbb", extTaken)).thenReturn(filesByCommit[1]);
-		Mockito.when(retriever.getFilesModifiedByCommit("ccc", extTaken)).thenReturn(filesByCommit[2]);
+		Mockito.when(retriever.getFilesModifiedByCommit("aaa", extTaken)).thenReturn(filesByCommit.get(0));
+		Mockito.when(retriever.getFilesModifiedByCommit("bbb", extTaken)).thenReturn(filesByCommit.get(1));
+		Mockito.when(retriever.getFilesModifiedByCommit("ccc", extTaken)).thenReturn(filesByCommit.get(2));
 		
 		controller = new FileByReleaseController(retriever, extTaken);
 	}

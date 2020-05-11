@@ -1,5 +1,6 @@
 package model;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public class BugTicket {
@@ -7,6 +8,7 @@ public class BugTicket {
 	private String[] affectedVersions;
 	private String[] fixedVersions;
 	private List<String> fileNames;
+	private LocalDate resolutionDate;
 	
 	public BugTicket(String key, String[] affectedVersions, String[] fixedVersions) {
 		this.affectedVersions = affectedVersions;
@@ -23,6 +25,10 @@ public class BugTicket {
 	
 	public String[] getAffectedVersions() {
 		return affectedVersions;
+	}
+	
+	public void setAffectedVersions(String[] affectedVersions) {
+		this.affectedVersions = affectedVersions;
 	}
 	
 	public String[] getFixedVersions() {
@@ -52,5 +58,13 @@ public class BugTicket {
 
 	public void setFileNames(List<String> fileNames) {
 		this.fileNames = fileNames;
+	}
+
+	public LocalDate getResolutionDate() {
+		return resolutionDate;
+	}
+
+	public void setResolutionDate(LocalDate resolutionDate) {
+		this.resolutionDate = resolutionDate;
 	}
 }

@@ -36,7 +36,7 @@ public class FileWithMetrics extends GitFile {
 	
 	public Object getFieldValue(CSVField field) {
 		switch(field) {
-		case BUGGY: return this.buggy;
+		case BUGGY: return this.getBuggyText();
 		case FILENAME: return this.getName();
 		default: return this.metrics.get(field.toString());
 		}

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,28 +36,27 @@ public class JIRATicketRetriever {
 	
 	private static void addTickets(JSONArray issues, Integer start, Integer end, 
 								ArrayList<BugTicket> tickets) {
-	for (int i = start; i < end; i++) {
-		JSONObject issue = issues.getJSONObject(i%1000);
-		String key = issue.get("key").toString();
-		JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
-		JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
-		
-		if (LOGGER.isLoggable(Level.WARNING)) {
-			if (versions.length() == 0)
-				LOGGER.warning(String.format("missing affected version %s", key));
-		
-			if (fixVersions.length() == 0)
-				LOGGER.warning(String.format("missing fixing version %s", key));
-		}
-		BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
-		tickets.add(bug);
-	} 
+		for (int i = start; i < end; i++) {
+			JSONObject issue = issues.getJSONObject(i%1000);
+			String key = issue.get("key").toString();
+			JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
+			JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
+			
+			if (LOGGER.isLoggable(Level.INFO)) {
+				if (fixVersions.length() == 0)
+					LOGGER.info(String.format("missing fixing version %s", key));
+			}
+			BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
+			tickets.add(bug);
+		} 
 	}
 	
-	public static BugTicket[] getBugTicket(String projName) {
+	public static List<BugTicket> getBugTicket(String projName) {
 		Integer i = 0;
 		Integer total = 1;
 		ArrayList<BugTicket> tickets = new ArrayList<>();
+		
+		LOGGER.setLevel(Level.WARNING);
 		
 		//Get JSON API for closed bugs w/ AV in the project
 		do {
@@ -83,7 +83,7 @@ public class JIRATicketRetriever {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} 
 		} while (i < total);
-		return tickets.toArray(new BugTicket[0]);
+		return tickets;
 	}
 	
 	public static ReleaseInfo[] getReleaseInfo(String projName) {

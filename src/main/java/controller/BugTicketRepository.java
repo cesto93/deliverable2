@@ -3,6 +3,8 @@ package controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import git.GitLogRetriever;
 import jira.JIRATicketRetriever;
@@ -13,6 +15,7 @@ public class BugTicketRepository {
 	
 	private GitLogRetriever retriever;
 	private String[] extTaken;
+	private static final Logger LOGGER = Logger.getLogger(BugTicketRepository.class.getName());
 	
 	public BugTicketRepository(GitLogRetriever retriever, String[] extTaken) {
 		this.retriever = retriever;
@@ -39,12 +42,38 @@ public class BugTicketRepository {
 	}
 	
 	public BugTicket[] getBugTicket(String projName) {
-		BugTicket[] tickets = JIRATicketRetriever.getBugTicket(projName);
-		for (BugTicket ticket : tickets) {
-		ticket.setFileNames(getFileModified(getGitCommits(ticket)));
+		List<BugTicket> tickets = JIRATicketRetriever.getBugTicket(projName);
+		StringBuilder bld = new StringBuilder();
+		for (int i = 0; i < tickets.size(); ) {
+			List<GitCommit> commits = getGitCommits(tickets.get(i));
+			if (commits.isEmpty()) {
+				bld.append(tickets.get(i).getKey() + " ");
+				tickets.remove(i);
+			} else {
+				tickets.get(i).setFileNames(getFileModified(commits));
+				tickets.get(i).setResolutionDate(commits.get(0).getDate());
+				i++;
+			}
 		}
-		return tickets;
+		if (LOGGER.isLoggable(Level.INFO))
+			LOGGER.info("removed empty ticket: " + bld.toString());
+		
+		handleMissingFV(tickets);
+		return tickets.toArray(new BugTicket[0]);
 	}
 	
+	private void handleMissingFV(List<BugTicket> tickets) {
+		StringBuilder bld = new StringBuilder();
+		for (int i = 0; i < tickets.size(); ) {
+			if (tickets.get(i).getFixedVersions().length == 0) {
+				bld.append(tickets.get(i).getKey() + " ");
+				tickets.remove(i);
+			}
+			else
+				i++;
+		}
+		if (LOGGER.isLoggable(Level.INFO))
+			LOGGER.info("removed ticket with no FV: " + bld.toString());
+	}
 	
 }

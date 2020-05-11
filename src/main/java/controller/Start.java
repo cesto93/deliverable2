@@ -42,10 +42,13 @@ public class Start {
 		BugTicket[] bugs = gitController.getBugTicket(projName);
 		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
 		
-		//TODO use proportion for missing affected versions
+		
+		Proportion.addMissingAV(bugs, relsInfo);
+		LOGGER.log(Level.INFO, "Done getting missing AV");
 		
 		//remove last half of versions
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2);
+		
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
 		LOGGER.log(Level.INFO, "Done getting release commits");
 		
