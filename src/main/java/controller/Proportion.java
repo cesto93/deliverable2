@@ -71,8 +71,7 @@ public class Proportion {
 		bug.setAffectedVersions(affectedVersions.toArray(new String[0]));
 	}
 	
-	private static Double calculateP(BugTicket ticket, int fv, int ov, ReleaseInfo[] releases) {
-		Integer iv = getIV(ticket, releases);
+	private static Double calculateP(int fv, int ov, Integer iv) {
 		if (iv == null || fv <= iv) {
 			if (LOGGER.isLoggable(Level.WARNING))
 				LOGGER.warning("iv not valid \t IV: " + iv);
@@ -92,7 +91,8 @@ public class Proportion {
 				continue;
 			}
 			if (ticket.getAffectedVersions().length != 0) {
-				Double p = calculateP(ticket, fv, ov, releases);
+				Integer iv = getIV(ticket, releases);
+				Double p = calculateP(fv, ov, iv);
 				mean.addValue(p);
 			} else {
 				if (!mean.isEmpty()) {
