@@ -27,13 +27,14 @@ public class Proportion {
 		Integer min = null;
 		for (String fv : ticket.getFixedVersions()) {
 			for (int i = 0; i < releases.length; i++) {
-				if (fv.equals(releases[i].getVersionID())) 
+				if (fv.equals(releases[i].getVersionID())) {
 					if (min == null) {
 						min = i;
 					}
 					else {
 						min = Math.min(min, i);
 					}
+				}
 			}
 		}
 		return min;
@@ -43,13 +44,14 @@ public class Proportion {
 		Integer min = null;
 		for (String iv : ticket.getAffectedVersions()) {
 			for (int i = 0; i < releases.length; i++) {
-				if (iv.equals(releases[i].getVersionID())) 
+				if (iv.equals(releases[i].getVersionID())) {
 					if (min == null) {
 						min = i;
 					}
 					else {
 						min = Math.min(min, i);
 					}
+				}
 			}
 		}
 		return min;
@@ -79,7 +81,7 @@ public class Proportion {
 				if (ticket.getAffectedVersions().length != 0) {
 					Integer iv = getIV(ticket, releases);
 					if ((iv != null) && (fv > iv)) {
-						double p = (fv - iv) / (fv - ov);
+						double p = ((double) (fv - iv)) / (fv - ov);
 						pSum += p;
 						n++;
 					} else {
@@ -87,8 +89,8 @@ public class Proportion {
 							LOGGER.warning("AV :" + ticket.getAffectedVersions()[0]);
 					}
 				} else {
-					double p = pSum / n;
-					if (p != 0) {
+					if (n != 0) {
+						double p = pSum / n;
 						int iv = (int) ((fv - ov) * p);
 						if (iv < fv)
 							addAV(ticket, iv, fv, releases);

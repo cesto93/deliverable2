@@ -39,7 +39,7 @@ public class TestProportion {
 	
 	@Test
 	public void TestGetIV() {
-		assertEquals(Proportion.getIV(bugs[3], releases), null);
+		assertEquals(null, Proportion.getIV(bugs[3], releases));
 		assertEquals(0, (int) Proportion.getIV(bugs[0], releases));
 		assertEquals(1, (int) Proportion.getIV(bugs[1], releases));
 		assertEquals(2, (int) Proportion.getIV(bugs[2], releases));
