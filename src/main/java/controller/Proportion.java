@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 
 import model.BugTicket;
 import model.ReleaseInfo;
+import utils.Mean;
 
 public class Proportion {
 	private static final Logger LOGGER = Logger.getLogger(Proportion.class.getName());
@@ -80,19 +81,8 @@ public class Proportion {
 		return ((double) (fv - iv)) / (fv - ov);
 	}
 	
-	private static void getAVfromP(BugTicket ticket, double pSum, int n, int fv, int ov, ReleaseInfo[] releases) {
-		if (n != 0) {
-			double p = pSum / n;
-			int iv = (int) ((fv - ov) * p);
-			addAV(ticket, iv, fv, releases);
-			return;
-		}
-			addAV(ticket, ov, fv, releases);
-	}
-	
 	public static void addMissingAV(BugTicket[] tickets, ReleaseInfo[] releases) {
-		double pSum = 0;
-		int n = 0;
+		Mean mean = new Mean();
 		for (BugTicket ticket : tickets) {
 			Integer ov = getOV(ticket.getResolutionDate(), releases);
 			Integer fv = getFV(ticket, releases);
@@ -103,13 +93,10 @@ public class Proportion {
 			}
 			if (ticket.getAffectedVersions().length != 0) {
 				Double p = calculateP(ticket, fv, ov, releases);
-				if (p != null) {
-					pSum += p;
-					n++;
-				}
+				mean.addValue(p);
 			} else {
-				if (n != 0) {
-					double p = pSum / n;
+				if (!mean.isEmpty()) {
+					double p = mean.getMean();
 					int iv = (int) ((fv - ov) * p);
 					addAV(ticket, iv, fv, releases);
 				} else {
