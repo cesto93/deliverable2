@@ -70,31 +70,24 @@ public class Proportion {
 		bug.setAffectedVersions(affectedVersions.toArray(new String[0]));
 	}
 	
-	private static Double calculateProportion(double pSum, int n, BugTicket ticket,  ReleaseInfo[] releases) {
-		Integer ov = getOV(ticket.getResolutionDate(), releases);
-		Integer fv = getFV(ticket, releases);
-		if ((ov == null) || (fv == null) || (fv <= ov)) {
+	private static Double calculateP(BugTicket ticket, int fv, int ov, ReleaseInfo[] releases) {
+		Integer iv = getIV(ticket, releases);
+		if (iv == null || fv <= iv) {
 			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.warning("fv or ov not valid FV:" + fv + " OV:" + ov + "\n");
+				LOGGER.warning("iv not valid \t IV: " + iv);
 			return null;
 		}
-		if (ticket.getAffectedVersions().length != 0) {
-			Integer iv = getIV(ticket, releases);
-			if (iv == null || fv <= iv) {
-				LOGGER.warning("iv not valid \t IV: " + iv);
-				return null;
-			}
-			return ((double) (fv - iv)) / (fv - ov);
-		} else {
-			if (n != 0) {
-				double p = pSum / n;
-				int iv = (int) ((fv - ov) * p);
-				addAV(ticket, iv, fv, releases);
-				return null;
-			}
-			addAV(ticket, ov, fv, releases);
+		return ((double) (fv - iv)) / (fv - ov);
+	}
+	
+	private static void getAVfromP(BugTicket ticket, double pSum, int n, int fv, int ov, ReleaseInfo[] releases) {
+		if (n != 0) {
+			double p = pSum / n;
+			int iv = (int) ((fv - ov) * p);
+			addAV(ticket, iv, fv, releases);
+			return;
 		}
-		return null;
+			addAV(ticket, ov, fv, releases);
 	}
 	
 	public static void addMissingAV(BugTicket[] tickets, ReleaseInfo[] releases) {
@@ -109,23 +102,20 @@ public class Proportion {
 				continue;
 			}
 			if (ticket.getAffectedVersions().length != 0) {
-				Integer iv = getIV(ticket, releases);
-				if (iv == null || fv <= iv) {
-					LOGGER.warning("iv not valid \t IV: " + iv);
-					continue;
+				Double p = calculateP(ticket, fv, ov, releases);
+				if (p != null) {
+					pSum += p;
+					n++;
 				}
-				double p = ((double) (fv - iv)) / (fv - ov);
-				pSum += p;
-				n++;
-				continue;
-			} 
-			if (n != 0) {
-				double p = pSum / n;
-				int iv = (int) ((fv - ov) * p);
-				addAV(ticket, iv, fv, releases);
-				continue;
+			} else {
+				if (n != 0) {
+					double p = pSum / n;
+					int iv = (int) ((fv - ov) * p);
+					addAV(ticket, iv, fv, releases);
+				} else {
+					addAV(ticket, ov, fv, releases);
+				}
 			}
-				addAV(ticket, ov, fv, releases);
 		}
 	}
 }
