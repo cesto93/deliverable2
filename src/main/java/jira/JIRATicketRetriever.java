@@ -42,9 +42,8 @@ public class JIRATicketRetriever {
 			JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
 			JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
 			
-			if (LOGGER.isLoggable(Level.INFO)) {
-				if (fixVersions.length() == 0)
-					LOGGER.info(String.format("missing fixing version %s", key));
+			if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
+				LOGGER.info(String.format("missing fixing version %s", key));
 			}
 			BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
 			tickets.add(bug);

@@ -3,8 +3,6 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.CSVField;
-
 public class FileWithMetrics extends GitFile {
 	private boolean buggy;
 	private Map<String, Integer> metrics;

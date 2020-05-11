@@ -44,7 +44,8 @@ public class BugTicketRepository {
 	public BugTicket[] getBugTicket(String projName) {
 		List<BugTicket> tickets = JIRATicketRetriever.getBugTicket(projName);
 		StringBuilder bld = new StringBuilder();
-		for (int i = 0; i < tickets.size(); ) {
+		int i = 0;
+		while(i < tickets.size()) {
 			List<GitCommit> commits = getGitCommits(tickets.get(i));
 			if (commits.isEmpty()) {
 				bld.append(tickets.get(i).getKey() + " ");
@@ -64,7 +65,8 @@ public class BugTicketRepository {
 	
 	private void handleMissingFV(List<BugTicket> tickets) {
 		StringBuilder bld = new StringBuilder();
-		for (int i = 0; i < tickets.size(); ) {
+		int i = 0;
+		while (i < tickets.size()) {
 			if (tickets.get(i).getFixedVersions().length == 0) {
 				bld.append(tickets.get(i).getKey() + " ");
 				tickets.remove(i);

@@ -28,10 +28,12 @@ public class Proportion {
 		for (String fv : ticket.getFixedVersions()) {
 			for (int i = 0; i < releases.length; i++) {
 				if (fv.equals(releases[i].getVersionID())) 
-					if (min == null) 
+					if (min == null) {
 						min = i;
-					else
+					}
+					else {
 						min = Math.min(min, i);
+					}
 			}
 		}
 		return min;
@@ -42,10 +44,12 @@ public class Proportion {
 		for (String iv : ticket.getAffectedVersions()) {
 			for (int i = 0; i < releases.length; i++) {
 				if (iv.equals(releases[i].getVersionID())) 
-					if (min == null) 
+					if (min == null) {
 						min = i;
-					else
+					}
+					else {
 						min = Math.min(min, i);
+					}
 			}
 		}
 		return min;
@@ -69,8 +73,8 @@ public class Proportion {
 			int ov = getOV(ticket.getResolutionDate(), releases);
 			Integer fv = getFV(ticket, releases);
 			if ((ov == -1) || (fv == null) || (fv <= ov)) {
-				if (fv != null && fv != 0  && fv != ov)
-					LOGGER.warning("fv or ov not valid FV:" + String.valueOf(fv) + " OV:" + String.valueOf(ov) + "\n");
+				if (fv != null && fv != 0  && fv != ov  && LOGGER.isLoggable(Level.WARNING))
+					LOGGER.warning("fv or ov not valid FV:" + fv + " OV:" + ov + "\n");
 			} else {
 				if (ticket.getAffectedVersions().length != 0) {
 					Integer iv = getIV(ticket, releases);

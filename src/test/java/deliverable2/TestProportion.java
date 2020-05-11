@@ -31,17 +31,17 @@ public class TestProportion {
 	
 	@Test
 	public void TestGetOV() {
-		assertEquals(Proportion.getOV(LocalDate.parse("2011-12-06"), releases), 0);
-		assertEquals(Proportion.getOV(LocalDate.parse("2011-12-08"), releases), 1);
-		assertEquals(Proportion.getOV(LocalDate.parse("2012-06-15"), releases), 2);
-		assertEquals(Proportion.getOV(LocalDate.parse("2013-01-18"), releases), -1);
+		assertEquals(0, Proportion.getOV(LocalDate.parse("2011-12-06"), releases));
+		assertEquals(1, Proportion.getOV(LocalDate.parse("2011-12-08"), releases));
+		assertEquals(2, Proportion.getOV(LocalDate.parse("2012-06-15"), releases));
+		assertEquals(-1, Proportion.getOV(LocalDate.parse("2013-01-18"), releases));
 	}
 	
 	@Test
 	public void TestGetIV() {
 		assertEquals(Proportion.getIV(bugs[3], releases), null);
-		assertEquals((int) Proportion.getIV(bugs[0], releases), 0);
-		assertEquals((int) Proportion.getIV(bugs[1], releases), 1);
-		assertEquals((int) Proportion.getIV(bugs[2], releases), 2);
+		assertEquals(0, (int) Proportion.getIV(bugs[0], releases));
+		assertEquals(1, (int) Proportion.getIV(bugs[1], releases));
+		assertEquals(2, (int) Proportion.getIV(bugs[2], releases));
 	}
 }
