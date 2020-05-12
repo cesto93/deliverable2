@@ -14,6 +14,8 @@ import model.CSVField;
 import model.FileByRelease;
 import model.FileWithMetrics;
 import model.ReleaseInfo;
+import weka.EvaluationResult;
+import weka.classifiers.Evaluation;
 
 public class CSVExporter {
 	
@@ -51,7 +53,6 @@ public class CSVExporter {
 	}
 	
 	public static void printGitFileByRelease(List<FileByRelease> fbr, String file) {
-		
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
@@ -61,6 +62,30 @@ public class CSVExporter {
 		    	for (int i = 0; i < fbr.size(); i++) {
 					for (FileWithMetrics fwm : fbr.get(i).getFiles()) {
 						printer.printRecord(getFieldsValues(i + 1, fwm, fields));
+					}
+				}
+		} catch (IOException e) {
+		     LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+	}
+	
+	public static void printEvaluationResult(EvaluationResult result, String file) {
+		try (
+				FileWriter fw = new FileWriter(file);
+				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
+			) {
+				printer.printRecord("DataSet", "#TrainingRelease", "Classifier", "Precision", "Recall", "AUC", "Kappa");
+				String dataset = result.getDateset();
+		    	String[] classifier = result.getClassifier();
+		    	Evaluation[][] eval = result.getEval();
+		    	for (int i = 0; i < eval.length; i++) {
+					for (int j = 0; j < eval[i].length; j++) {
+						double precision = eval[i][j].precision(1);
+						double recall = eval[i][j].recall(1);
+						double auc = eval[i][j].areaUnderROC(1);
+						double kappa = eval[i][j].kappa();
+						
+						printer.printRecord(dataset, i + 1, classifier[j], precision, recall, auc, kappa);
 					}
 				}
 		} catch (IOException e) {

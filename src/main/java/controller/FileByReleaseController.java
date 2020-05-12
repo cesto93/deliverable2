@@ -45,23 +45,19 @@ public class FileByReleaseController {
 		return res;
 	}
 	
-	public void setLoc(List<FileByRelease> files) {
-		for (FileByRelease filesInRel : files) {
-			for (FileWithMetrics file : filesInRel.getFiles())
-				file.setLoc(retriever.getLOC(file.getHash()));
-		}
-	}
-	
-	public static void setFileBuggy(List<FileByRelease> files) {
-		for (FileByRelease filesInRel : files) {
-			for (BugTicket bug : filesInRel.getRelease().getBugs()) { 
-				for (FileWithMetrics file : filesInRel.getFiles()) {
-					if (!file.isBuggy() && bug.getFileNames().contains(file.getName())) {
-						file.setBuggy(true);
-					}
+	public static void setFileBuggy(FileByRelease fbr) {
+		for (BugTicket bug : fbr.getRelease().getBugs()) { 
+			for (FileWithMetrics file : fbr.getFiles()) {
+				if (!file.isBuggy() && bug.getFileNames().contains(file.getName())) {
+					file.setBuggy(true);
 				}
 			}
 		}
+	}
+	
+	public void setLoc(FileByRelease fbr) {
+			for (FileWithMetrics file : fbr.getFiles())
+				file.setLoc(retriever.getLOC(file.getHash()));
 	}
 	
 	public void setnAuth(FileByRelease fbr) {
@@ -85,13 +81,7 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public void setnAuth(List<FileByRelease> fbr) {
-		for (FileByRelease filesInRel : fbr) {
-			setnAuth(filesInRel);
-		}
-	}
-	
-	private void setnRevisions(FileByRelease fbr) {
+	public void setnRevisions(FileByRelease fbr) {
 		HashMap<String, Integer> rev = new HashMap<>();
 		for (GitCommit commit : fbr.getRelease().getCommits()) {
 			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
@@ -103,13 +93,7 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public void setnRevisions(List<FileByRelease> fbr) {
-		for (FileByRelease filesInRel : fbr) {
-			setnRevisions(filesInRel);
-		}
-	}
-	
-	private void setLocTouchedAndChurn(FileByRelease fbr) {
+	public void setLocTouchedAndChurn(FileByRelease fbr) {
 		HashMap<String, Integer> added = new HashMap<>();
 		HashMap<String, Integer> touched = new HashMap<>();
 		HashMap<String, Integer> churn = new HashMap<>();
@@ -131,25 +115,17 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public void setLocTouchedAndChurn(List<FileByRelease> fbr) {
-		for (FileByRelease filesInRel : fbr) {
-			setLocTouchedAndChurn(filesInRel);
-		}
-	}
-	
 	//needs nRevision, Churn, LocAdded to be setted
-	public void setAvgMetrics(List<FileByRelease> fbr) {
-		for (FileByRelease filesInRel : fbr) {
-			for (FileWithMetrics file :filesInRel.getFiles()) {
-				if (file.getnRevisions() != 0) {
-					file.setAvgChurn(file.getChurn() / file.getnRevisions());
-					file.setAvgLocAdded((file.getLocAdded() / file.getnRevisions()));
-				}
-				else
-				{
-					file.setAvgChurn(0);
-					file.setAvgLocAdded(0);
-				}
+	public void setAvgMetrics(FileByRelease fbr) {
+		for (FileWithMetrics file :fbr.getFiles()) {
+			if (file.getnRevisions() != 0) {
+				file.setAvgChurn(file.getChurn() / file.getnRevisions());
+				file.setAvgLocAdded((file.getLocAdded() / file.getnRevisions()));
+			}
+			else
+			{
+				file.setAvgChurn(0);
+				file.setAvgLocAdded(0);
 			}
 		}
 	}

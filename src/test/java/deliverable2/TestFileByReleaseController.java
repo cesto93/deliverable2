@@ -71,9 +71,11 @@ public class TestFileByReleaseController {
 		expected.get(2).setnRevisions(1);
 		expected.get(3).setnRevisions(0);
 		
-		controller.setnRevisions(fbrs);
-		for (int i = 0; i < fbrs.get(0).getFiles().size(); i++) {
-				assertEquals(fbrs.get(0).getFiles().get(i).getnRevisions(), expected.get(i).getnRevisions());
+		for (FileByRelease fbr : fbrs) {
+			controller.setnRevisions(fbr);
+			for (int i = 0; i < fbrs.get(0).getFiles().size(); i++) {
+					assertEquals(fbrs.get(0).getFiles().get(i).getnRevisions(), expected.get(i).getnRevisions());
+			}
 		}
 	}
 }

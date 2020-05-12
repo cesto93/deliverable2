@@ -15,19 +15,29 @@ import model.BugTicket;
 import model.FileByRelease;
 import model.ReleaseInfo;
 import utils.GetProperty;
+import weka.EvaluationResult;
+import weka.ModelComparer;
 import model.Release;
 
 public class Start {
 	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
+	private static final String[] extTaken = {".java", ".cpp"};
+	private static final String versionSuffix = "VersionInfo.csv";
+	private static final String metricsSuffix = "File.csv";
 	
 	public static void main(String[] args) {
-		final String[] extTaken = {".java", ".cpp"};
+		
 		final String projName = GetProperty.getProperty("projectName");
 		final String urlProj = GetProperty.getProperty("urlProject");
 		File repoPathProj = new File(GetProperty.getProperty("repoPath"), 
 										GetProperty.getProperty("repoDir"));
 		//ZOOKEEPER
+		elaborateMetrics(projName, urlProj, repoPathProj);
+		predictBugginess(projName);
 		
+	}
+	
+	private static void elaborateMetrics(String projName, String urlProj, File repoPathProj) {
 		GitLogRetriever retriever = new GitLogRetriever(new GitRepoHandler(urlProj, repoPathProj));
 		BugTicketRepository gitController = new BugTicketRepository(retriever, extTaken);
 		ReleaseController relController = new ReleaseController(retriever);
@@ -36,18 +46,16 @@ public class Start {
 		ReleaseInfo[] relsInfo = JIRATicketRetriever.getReleaseInfo(projName);
 		if (relsInfo == null || relsInfo.length < 6)
 			return;
-		CSVExporter.printReleaseInfo(relsInfo, projName + "VersionInfo.csv");
+		CSVExporter.printReleaseInfo(relsInfo, projName + versionSuffix);
 		LOGGER.log(Level.INFO, "Done writing release");
 		
 		BugTicket[] bugs = gitController.getBugTicket(projName);
 		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
 		
-		
 		Proportion.addMissingAV(bugs, relsInfo);
 		LOGGER.log(Level.INFO, "Done getting missing AV");
 		
-		//remove last half of versions
-		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2);
+		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
 		LOGGER.log(Level.INFO, "Done getting release commits");
@@ -55,24 +63,23 @@ public class Start {
 		List<FileByRelease> files = fbrController.getFileByRelease(releases);
 		LOGGER.log(Level.INFO, "Done getting file by release");
 		
-		fbrController.setLoc(files);
-		LOGGER.log(Level.INFO, "Done set LOC");
-		fbrController.setnRevisions(files);
-		LOGGER.log(Level.INFO, "Done set nRev");
-		fbrController.setnAuth(files);
-		LOGGER.log(Level.INFO, "Done set nAuth");
-		fbrController.setLocTouchedAndChurn(files);
-		LOGGER.log(Level.INFO, "Done set touchedAndChurn");
-		fbrController.setAvgMetrics(files);
-		LOGGER.log(Level.INFO, "Done set AVGChurn and AVGLocAdded");
+		for (FileByRelease fbr : files) {
+			FileByReleaseController.setFileBuggy(fbr);
+			fbrController.setLoc(fbr);
+			fbrController.setnRevisions(fbr);
+			fbrController.setnAuth(fbr);
+			fbrController.setLocTouchedAndChurn(fbr);
+			fbrController.setAvgMetrics(fbr);
+		}
 		fbrController.setAge(files);
 		LOGGER.log(Level.INFO, "Done set Age");
-		
-		FileByReleaseController.setFileBuggy(files);
-		LOGGER.log(Level.INFO, "Done setFileBuggy");
-		CSVExporter.printGitFileByRelease(files,  projName + "File.csv");
+		CSVExporter.printGitFileByRelease(files,  projName + metricsSuffix);
 		LOGGER.log(Level.INFO, "Done");
-		
+	}
+	
+	public static void predictBugginess(String projName) {
+		EvaluationResult result = ModelComparer.compare(projName, projName + metricsSuffix);
+		CSVExporter.printEvaluationResult(result, projName + "_Evaluation");
 	}
 
 }
