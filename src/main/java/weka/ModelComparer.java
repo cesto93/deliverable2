@@ -1,18 +1,24 @@
 package weka;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import weka.classifiers.Evaluation;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
 public class ModelComparer {
+	private static final Logger LOGGER = Logger.getLogger(ModelComparer.class.getName());
 	
+	private ModelComparer() {
+	    throw new IllegalStateException("Utility class");
+	}
 	
 	public static EvaluationResult compare(String name, String file) {
 		try {
 			DataSource source = new DataSource(file);
 			Instances dataset = source.getDataSet();
 			int nRel = dataset.numDistinctValues(0);
-			System.out.println("nrel " + nRel);
 			EvaluationResult result = new EvaluationResult(name, nRel - 1, 3);
 			Evaluation[][] eval = new Evaluation[nRel - 1][3];
 			String[] classifier = new String[] {"Random Forset", "Naive Bayes", "IBk"};
@@ -27,8 +33,7 @@ public class ModelComparer {
 			result.setEval(eval);
 			return result;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
 	}

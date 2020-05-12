@@ -22,8 +22,8 @@ import model.Release;
 public class Start {
 	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
 	private static final String[] extTaken = {".java", ".cpp"};
-	private static final String versionSuffix = "VersionInfo.csv";
-	private static final String metricsSuffix = "File.csv";
+	private static final String VERSIONSUF = "VersionInfo.csv";
+	private static final String METRICSUF = "File.csv";
 	
 	public static void main(String[] args) {
 		
@@ -46,7 +46,7 @@ public class Start {
 		ReleaseInfo[] relsInfo = JIRATicketRetriever.getReleaseInfo(projName);
 		if (relsInfo == null || relsInfo.length < 6)
 			return;
-		CSVExporter.printReleaseInfo(relsInfo, projName + versionSuffix);
+		CSVExporter.printReleaseInfo(relsInfo, projName + VERSIONSUF);
 		LOGGER.log(Level.INFO, "Done writing release");
 		
 		BugTicket[] bugs = gitController.getBugTicket(projName);
@@ -73,12 +73,12 @@ public class Start {
 		}
 		fbrController.setAge(files);
 		LOGGER.log(Level.INFO, "Done set Age");
-		CSVExporter.printGitFileByRelease(files,  projName + metricsSuffix);
+		CSVExporter.printGitFileByRelease(files,  projName + METRICSUF);
 		LOGGER.log(Level.INFO, "Done");
 	}
 	
 	public static void predictBugginess(String projName) {
-		EvaluationResult result = ModelComparer.compare(projName, projName + metricsSuffix);
+		EvaluationResult result = ModelComparer.compare(projName, projName + METRICSUF);
 		CSVExporter.printEvaluationResult(result, projName + "_Evaluation");
 	}
 
