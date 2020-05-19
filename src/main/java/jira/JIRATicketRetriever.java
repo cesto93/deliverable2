@@ -34,16 +34,14 @@ public class JIRATicketRetriever {
 		return list;
 	}
 	
-	private static void addTickets(JSONArray issues, Integer start, Integer end, 
-								ArrayList<BugTicket> tickets) {
+	private static void addTickets(JSONArray issues, Integer start, Integer end, List<BugTicket> tickets) {
 		for (int i = start; i < end; i++) {
 			JSONObject issue = issues.getJSONObject(i%1000);
 			String key = issue.get("key").toString();
-			
-			LocalDate date = LocalDateTime.parse(issue.getJSONObject("fields").get("created").toString().split("\\+")[0])
-							.toLocalDate();
-			JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
-			JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
+			JSONObject fields = issue.getJSONObject("fields");
+			LocalDate date = LocalDateTime.parse(fields.get("created").toString().split("\\+")[0]).toLocalDate();
+			JSONArray versions = fields.getJSONArray("versions");
+			JSONArray fixVersions = fields.getJSONArray("fixVersions");
 			
 			if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
 				LOGGER.info(String.format("missing fixing version %s", key));

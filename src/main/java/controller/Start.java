@@ -35,8 +35,8 @@ public class Start {
 		elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
 		predictBugginess(projName[0]);
 		
-		//elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
-		//predictBugginess(projName[1]);
+		elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
+		predictBugginess(projName[1]);
 		LOGGER.log(Level.INFO, "Done");
 	}
 	
