@@ -87,7 +87,7 @@ public class Proportion {
 			Integer ov = getOV(ticket.getCreationDate(), releases);
 			Integer fv = getFV(ticket, releases);
 			if ((ov == null) || (fv == null) || (fv <= ov)) {
-				if (LOGGER.isLoggable(Level.WARNING) && !fv.equals(ov)  && ov != null)
+				if (LOGGER.isLoggable(Level.WARNING) && fv != null && ov != null && !fv.equals(ov))
 					LOGGER.warning("fv or ov not valid FV: " + fv + " date: " + 
 									ticket.getCreationDate() + "OV: " + ov);
 				continue;
