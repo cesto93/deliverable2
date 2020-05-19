@@ -13,7 +13,7 @@ import org.apache.commons.csv.CSVPrinter;
 import model.CSVField;
 import model.FileByRelease;
 import model.FileWithMetrics;
-import model.ReleaseInfo;
+import model.Release;
 import weka.EvaluationResult;
 import weka.classifiers.Evaluation;
 
@@ -28,15 +28,16 @@ public class CSVExporter {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	public static void printReleaseInfo(ReleaseInfo[] rs, String file) {
+	public static void printReleaseInfo(Release[] rs, String file) {
 		try (
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
 		    	printer.printRecord("Index", "Version ID", "Version Name", "Date");
 		    	int pos = 1;
-		    	for (ReleaseInfo r : rs) {
-		    		printer.printRecord(pos, r.getVersionID(), r.getVersionName(), r.getDate());
+		    	for (Release r : rs) {
+		    		printer.printRecord(pos, r.getReleaseInfo().getVersionID(), r.getReleaseInfo().getVersionName(), 
+		    							r.getReleaseInfo().getDate());
 		    		pos++;
 		    	}
 		} catch (IOException e) {

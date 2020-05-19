@@ -39,6 +39,7 @@ public class FileByReleaseController {
 					filesInRel.add(new FileWithMetrics(file.getName(), file.getHash()));
 				}
 			}
+			
 			byRelease.setFiles(new ArrayList<>(filesInRel));
 			res.add(byRelease);
 		}

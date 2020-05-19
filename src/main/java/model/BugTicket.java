@@ -5,15 +5,16 @@ import java.util.List;
 
 public class BugTicket {
 	private String key;
-	private String[] affectedVersions;
-	private String[] fixedVersions;
+	private List<String> affectedVersions;
+	private List<String> fixedVersions;
 	private List<String> fileNames;
-	private LocalDate resolutionDate;
+	private LocalDate creationDate;
 	
-	public BugTicket(String key, String[] affectedVersions, String[] fixedVersions) {
+	public BugTicket(String key, List<String> affectedVersions, List<String> fixedVersions, LocalDate creationDate) {
 		this.affectedVersions = affectedVersions;
 		this.key = key;
 		this.fixedVersions = fixedVersions;
+		this.creationDate = creationDate;
 	}
 	
 	public String getKey() {
@@ -23,15 +24,15 @@ public class BugTicket {
 		this.key = key;
 	}
 	
-	public String[] getAffectedVersions() {
+	public List<String> getAffectedVersions() {
 		return affectedVersions;
 	}
 	
-	public void setAffectedVersions(String[] affectedVersions) {
+	public void setAffectedVersions(List<String> affectedVersions) {
 		this.affectedVersions = affectedVersions;
 	}
 	
-	public String[] getFixedVersions() {
+	public List<String> getFixedVersions() {
 		return fixedVersions;
 	}
 	
@@ -60,11 +61,11 @@ public class BugTicket {
 		this.fileNames = fileNames;
 	}
 
-	public LocalDate getResolutionDate() {
-		return resolutionDate;
+	public LocalDate getCreationDate() {
+		return creationDate;
 	}
 
-	public void setResolutionDate(LocalDate resolutionDate) {
-		this.resolutionDate = resolutionDate;
+	public void setCreationDate(LocalDate resolutionDate) {
+		this.creationDate = resolutionDate;
 	}
 }

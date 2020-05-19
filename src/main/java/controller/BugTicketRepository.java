@@ -10,6 +10,7 @@ import git.GitLogRetriever;
 import jira.JIRATicketRetriever;
 import model.BugTicket;
 import model.GitCommit;
+import model.ReleaseInfo;
 
 public class BugTicketRepository {
 	
@@ -41,8 +42,12 @@ public class BugTicketRepository {
 		return fileNames;
 	}
 	
-	public BugTicket[] getBugTicket(String projName) {
+	public List<BugTicket> getBugTicket(String projName,  ReleaseInfo[] rels) {
 		List<BugTicket> tickets = JIRATicketRetriever.getBugTicket(projName);
+		removeUnkownFV(tickets, rels);
+		removeUnkownAV(tickets, rels);
+		handleMissingFV(tickets);
+		
 		StringBuilder bld = new StringBuilder();
 		int i = 0;
 		while(i < tickets.size()) {
@@ -52,22 +57,42 @@ public class BugTicketRepository {
 				tickets.remove(i);
 			} else {
 				tickets.get(i).setFileNames(getFileModified(commits));
-				tickets.get(i).setResolutionDate(commits.get(0).getDate());
 				i++;
 			}
 		}
 		if (LOGGER.isLoggable(Level.INFO))
 			LOGGER.info("removed empty ticket: " + bld.toString());
 		
-		handleMissingFV(tickets);
-		return tickets.toArray(new BugTicket[0]);
+		return tickets;
+	}
+	
+	public static void removeUnkownAV(List<BugTicket> tickets, ReleaseInfo[] rels) {
+		List<String> relIds = new ArrayList<>(rels.length);
+		for (ReleaseInfo rel : rels) {
+			relIds.add(rel.getVersionID());
+		}
+		
+		for (BugTicket ticket : tickets) {
+			ticket.getAffectedVersions().removeIf(av -> !relIds.contains(av));
+		}
+	}
+	
+	public static void removeUnkownFV(List<BugTicket> tickets, ReleaseInfo[] rels) {
+		List<String> relIds = new ArrayList<>(rels.length);
+		for (ReleaseInfo rel : rels) {
+			relIds.add(rel.getVersionID());
+		}
+		
+		for (BugTicket ticket : tickets) {
+			ticket.getFixedVersions().removeIf(fv -> !relIds.contains(fv));
+		}
 	}
 	
 	private void handleMissingFV(List<BugTicket> tickets) {
 		StringBuilder bld = new StringBuilder();
 		int i = 0;
 		while (i < tickets.size()) {
-			if (tickets.get(i).getFixedVersions().length == 0) {
+			if (tickets.get(i).getFixedVersions().isEmpty()) {
 				bld.append(tickets.get(i).getKey() + " ");
 				tickets.remove(i);
 			}

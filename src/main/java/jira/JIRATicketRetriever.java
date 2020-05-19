@@ -26,12 +26,12 @@ public class JIRATicketRetriever {
 	    throw new IllegalStateException("Utility class");
 	}
 	
-	private static String[] toStringArray(JSONArray array, String jsonKey) {
+	private static List<String> toStringList(JSONArray array, String jsonKey) {
 		ArrayList <String> list = new ArrayList<>();
 		for (int k = 0; k < array.length(); k++) {
 			list.add(array.getJSONObject(k).getString(jsonKey));
 		}
-		return list.toArray(new String[0]);
+		return list;
 	}
 	
 	private static void addTickets(JSONArray issues, Integer start, Integer end, 
@@ -39,13 +39,16 @@ public class JIRATicketRetriever {
 		for (int i = start; i < end; i++) {
 			JSONObject issue = issues.getJSONObject(i%1000);
 			String key = issue.get("key").toString();
+			
+			LocalDate date = LocalDateTime.parse(issue.getJSONObject("fields").get("created").toString().split("\\+")[0])
+							.toLocalDate();
 			JSONArray versions = issue.getJSONObject("fields").getJSONArray("versions");
 			JSONArray fixVersions = issue.getJSONObject("fields").getJSONArray("fixVersions");
 			
 			if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
 				LOGGER.info(String.format("missing fixing version %s", key));
 			}
-			BugTicket bug = new BugTicket(key, toStringArray(versions, "id"), toStringArray(fixVersions, "id"));
+			BugTicket bug = new BugTicket(key, toStringList(versions, "id"), toStringList(fixVersions, "id"), date);	
 			tickets.add(bug);
 		} 
 	}
@@ -85,7 +88,7 @@ public class JIRATicketRetriever {
 		return tickets;
 	}
 	
-	public static ReleaseInfo[] getReleaseInfo(String projName) {
+	public static List<ReleaseInfo> getReleaseInfo(String projName) {
 		//Ignores releases with missing dates
 		// If 2 release has the same dates pick the last one
 		TreeMap<LocalDateTime, ReleaseInfo> releases = new TreeMap<>();
@@ -111,6 +114,6 @@ public class JIRATicketRetriever {
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
-		return releases.values().toArray(new ReleaseInfo[0]);
+		return new ArrayList<>(releases.values());
 	}
 }

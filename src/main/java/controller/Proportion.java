@@ -2,6 +2,7 @@ package controller;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,7 +69,7 @@ public class Proportion {
 		if (LOGGER.isLoggable(Level.INFO))
 			LOGGER.info(bug.getKey() + ": " + affectedVersions.toString());
 		
-		bug.setAffectedVersions(affectedVersions.toArray(new String[0]));
+		bug.setAffectedVersions(affectedVersions);
 	}
 	
 	private static Double calculateP(int fv, int ov, Integer iv) {
@@ -80,17 +81,18 @@ public class Proportion {
 		return ((double) (fv - iv)) / (fv - ov);
 	}
 	
-	public static void addMissingAV(BugTicket[] tickets, ReleaseInfo[] releases) {
+	public static void addMissingAV(List<BugTicket> tickets, ReleaseInfo[] releases) {
 		Mean mean = new Mean();
 		for (BugTicket ticket : tickets) {
-			Integer ov = getOV(ticket.getResolutionDate(), releases);
+			Integer ov = getOV(ticket.getCreationDate(), releases);
 			Integer fv = getFV(ticket, releases);
 			if ((ov == null) || (fv == null) || (fv <= ov)) {
-				if (LOGGER.isLoggable(Level.WARNING))
-					LOGGER.warning("fv or ov not valid FV:" + fv + " OV:" + ov + "\n");
+				if (LOGGER.isLoggable(Level.WARNING) && fv != ov  && ov != null)
+					LOGGER.warning("fv or ov not valid FV: " + fv + " date: " + 
+									ticket.getCreationDate() + "OV: " + ov);
 				continue;
 			}
-			if (ticket.getAffectedVersions().length != 0) {
+			if (ticket.getAffectedVersions().size() != 0) {
 				Integer iv = getIV(ticket, releases);
 				Double p = calculateP(fv, ov, iv);
 				mean.addValue(p);
