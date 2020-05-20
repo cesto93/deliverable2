@@ -1,5 +1,6 @@
 package weka;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import weka.attributeSelection.AttributeSelection;
@@ -78,6 +79,7 @@ public class InstancesRepository {
 			attSelection.SelectAttributes(inst);
 			return attSelection.reduceDimensionality(inst);
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.getMessage(), e);
 		}
 	    	return null;
 	}
