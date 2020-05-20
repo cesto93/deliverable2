@@ -7,43 +7,15 @@ import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
-import weka.core.converters.ConverterUtils.DataSource;
 
-public class EvaluateModel {
+public class Evaluator {
 	private Instances training;
 	private Instances testing;
-	private static final Logger LOGGER = Logger.getLogger(EvaluateModel.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(Evaluator.class.getName());
 	
-	public EvaluateModel(String file, int nRevTrain) {
-		try {
-			DataSource source1 = new DataSource(file);
-			training = source1.getDataSet();
-			DataSource source2 = new DataSource(file);
-			testing = source2.getDataSet();
-		} catch (Exception e) {
-			LOGGER.warning(e.toString());
-		}
-		int numAttr = training.numAttributes();
-		training.setClassIndex(numAttr - 1);
-		testing.setClassIndex(numAttr - 1);
-		removeVersionAfter(training, nRevTrain);
-		removeVersionUntil(testing, nRevTrain);
-	}
-	
-	public void removeVersionUntil(Instances insts, int end) {
-		for (int i = insts.numInstances() - 1; i >= 0; i--) {
-		    if (insts.get(i).value(0) <= end) {
-		    	insts.delete(i);
-		    }
-		}
-	}
-	
-	public void removeVersionAfter(Instances insts, int start) {
-		for (int i = insts.numInstances() - 1; i >= 0; i--) {
-		    if (insts.get(i).value(0) > start) {
-		    	insts.delete(i);
-		    }
-		}
+	public Evaluator(Instances training, Instances testing) {
+		this.training = training;
+		this.testing = testing;
 	}
 	
 	public Evaluation evaluateNaiveBayes() {
@@ -85,4 +57,5 @@ public class EvaluateModel {
 		} 
 			return null;
 	}
+	
 }

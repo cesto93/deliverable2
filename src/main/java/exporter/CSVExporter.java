@@ -75,10 +75,12 @@ public class CSVExporter {
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-				printer.printRecord("DataSet", "#TrainingRelease", "Classifier", "Precision", "Recall", "AUC", "Kappa");
+				printer.printRecord("DataSet", "#TrainingRelease", "Classifier", "Feature Selection", 
+									"Precision", "Recall", "AUC", "Kappa");
 				String dataset = result.getDateset();
 		    	String[] classifier = result.getClassifier();
 		    	Evaluation[][] eval = result.getEval();
+		    	Evaluation[][] evalFS = result.getEvalFS();
 		    	for (int i = 0; i < eval.length; i++) {
 					for (int j = 0; j < eval[i].length; j++) {
 						double precision = eval[i][j].precision(1);
@@ -86,7 +88,13 @@ public class CSVExporter {
 						double auc = eval[i][j].areaUnderROC(1);
 						double kappa = eval[i][j].kappa();
 						
-						printer.printRecord(dataset, i + 1, classifier[j], precision, recall, auc, kappa);
+						printer.printRecord(dataset, i + 1, classifier[j], "No", precision, recall, auc, kappa);
+						
+						precision = evalFS[i][j].precision(1);
+						recall = evalFS[i][j].recall(1);
+						auc = evalFS[i][j].areaUnderROC(1);
+						kappa = evalFS[i][j].kappa();
+						printer.printRecord(dataset, i + 1, classifier[j], "Best First", precision, recall, auc, kappa);
 					}
 				}
 		} catch (IOException e) {

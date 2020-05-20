@@ -7,6 +7,7 @@ public class EvaluationResult {
 	private int trainingRelease;
 	private String[] classifier;
 	private Evaluation[][] eval;
+	private Evaluation[][] evalFS;
 	
 	public EvaluationResult(String dataset, int nRelease, int nClassifier) {
 		this.setDateset(dataset);
@@ -39,6 +40,14 @@ public class EvaluationResult {
 
 	public void setEval(Evaluation[][] eval) {
 		this.eval = eval;
+	}
+
+	public Evaluation[][] getEvalFS() {
+		return evalFS;
+	}
+
+	public void setEvalFS(Evaluation[][] evalFS) {
+		this.evalFS = evalFS;
 	}
 	
 }

@@ -19,22 +19,38 @@ public class ModelComparer {
 			DataSource source = new DataSource(file);
 			Instances dataset = source.getDataSet();
 			int nRel = dataset.numDistinctValues(0);
+			InstancesRepository repo = new InstancesRepository(file);
+			
 			EvaluationResult result = new EvaluationResult(name, nRel - 1, 3);
 			Evaluation[][] eval = new Evaluation[nRel - 1][3];
-			String[] classifier = new String[] {"Random Forset", "Naive Bayes", "IBk"};
+			Evaluation[][] evalFS = new Evaluation[nRel - 1][3];
+			String[] classifier = new String[] {"Random Forest", "Naive Bayes", "IBk"};
+			
 			for (int i = 1; i < nRel; i++) {
-				EvaluateModel evalModel = new EvaluateModel(file, i);
+				Instances training = repo.getTraining(i, false);
+				Instances testing = repo.getTest(i, false);
+				Evaluator evalModel = new Evaluator(training, testing);
 				
 				eval[i -1][0] = evalModel.evaluateRandomForest();
 				eval[i -1][1] = evalModel.evaluateNaiveBayes();
 				eval[i -1][2] = evalModel.evaluateIBk();
+				
+				Instances trainingFS = repo.getTraining(i, true);
+				Instances testingFS = repo.getTest(i, true);
+				evalModel = new Evaluator(trainingFS, testingFS);
+				
+				evalFS[i -1][0] = evalModel.evaluateRandomForest();
+				evalFS[i -1][1] = evalModel.evaluateNaiveBayes();
+				evalFS[i -1][2] = evalModel.evaluateIBk();
 			}
 			result.setClassifier(classifier);
 			result.setEval(eval);
+			result.setEvalFS(evalFS);
 			return result;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
 	}
+	
 }
