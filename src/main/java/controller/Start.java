@@ -32,11 +32,11 @@ public class Start {
 		final String[] repoDir = {GetProperty.getProperty("repoDir1"), GetProperty.getProperty("repoDir2")};
 		final String repoPath = GetProperty.getProperty("repoPath");
 		
-		elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
+		//elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
 		predictBugginess(projName[0]);
 		
-		elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
-		predictBugginess(projName[1]);
+		//elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
+		//predictBugginess(projName[1]);
 		LOGGER.log(Level.INFO, "Done");
 	}
 	
@@ -47,14 +47,14 @@ public class Start {
 		FileByReleaseController fbrController = new FileByReleaseController(retriever, extTaken);
 		
 		ReleaseInfo[] relsInfo = relController.getReleaseInfo(projName);
-		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		LOGGER.log(Level.INFO, "Done getting release");
 		List<BugTicket> bugs = bugRepo.getBugTicket(projName, relsInfo);
-		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
 		Proportion.addMissingAV(bugs, relsInfo);
 		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
 		
+		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
+		
 		CSVExporter.printReleaseInfo(releases, projName + VERSIONSUF);
 		LOGGER.log(Level.INFO, "Done writing release");
 		

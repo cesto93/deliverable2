@@ -1,18 +1,16 @@
 package weka;
 
-import weka.classifiers.Evaluation;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class EvaluationResult {
 	private String dataset;
-	private int trainingRelease;
-	private String[] classifier;
-	private Evaluation[][] eval;
-	private Evaluation[][] evalFS;
+	private List<Map<EvaluationOptions, CompactEvaluation>> eval;
 	
 	public EvaluationResult(String dataset, int nRelease, int nClassifier) {
 		this.setDateset(dataset);
-		setEval(new Evaluation[nRelease][nClassifier]);
-		classifier = new String[nClassifier];
+		this.eval = new ArrayList<>();
 	}
 	
 	public String getDateset() {
@@ -21,33 +19,13 @@ public class EvaluationResult {
 	public void setDateset(String dataset) {
 		this.dataset = dataset;
 	}
-	public int getTrainingRelease() {
-		return trainingRelease;
-	}
-	public void setTrainingRelease(int trainingRelease) {
-		this.trainingRelease = trainingRelease;
-	}
-	public String[] getClassifier() {
-		return classifier;
-	}
-	public void setClassifier(String[] classifier) {
-		this.classifier = classifier;
-	}
 
-	public Evaluation[][] getEval() {
+	public List<Map<EvaluationOptions, CompactEvaluation>> getEval() {
 		return eval;
 	}
 
-	public void setEval(Evaluation[][] eval) {
+	public void setEval(List<Map<EvaluationOptions, CompactEvaluation>> eval) {
 		this.eval = eval;
-	}
-
-	public Evaluation[][] getEvalFS() {
-		return evalFS;
-	}
-
-	public void setEvalFS(Evaluation[][] evalFS) {
-		this.evalFS = evalFS;
 	}
 	
 }

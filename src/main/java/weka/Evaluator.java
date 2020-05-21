@@ -1,12 +1,13 @@
 package weka;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.lazy.IBk;
-import weka.classifiers.trees.RandomForest;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Instances;
+import weka.filters.supervised.instance.Resample;
 
 public class Evaluator {
 	private Instances training;
@@ -18,44 +19,31 @@ public class Evaluator {
 		this.testing = testing;
 	}
 	
-	public Evaluation evaluateNaiveBayes() {
+	public Evaluation evaluate(Classifier classifier) {
 		try {
-			NaiveBayes classifier = new NaiveBayes();
 			classifier.buildClassifier(training);
 			Evaluation eval = new Evaluation(testing);	
 			eval.evaluateModel(classifier, testing);
 			return eval;
 
 		} catch (Exception e) {
-			LOGGER.warning(e.toString());
-		} 
-			return null;
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return null;
 	}
 	
-	public Evaluation evaluateRandomForest() {
+	public static FilteredClassifier getResample(Classifier classifier, Instances inst) {
 		try {
-			RandomForest classifier = new RandomForest();
-			classifier.buildClassifier(training);
-			Evaluation eval = new Evaluation(testing);	
-			eval.evaluateModel(classifier, testing);
-			return eval;
+			Resample resample = new Resample();
+			resample.setInputFormat(inst);
+			FilteredClassifier fc = new FilteredClassifier();
+			fc.setFilter(resample);
+			fc.setClassifier(classifier);
+			return fc;
 		} catch (Exception e) {
-			LOGGER.warning(e.toString());
-		} 
-			return null;
-	}
-	
-	public Evaluation evaluateIBk() {
-		try {
-			IBk classifier = new IBk();
-			classifier.buildClassifier(training);
-			Evaluation eval = new Evaluation(testing);	
-			eval.evaluateModel(classifier, testing);
-			return eval;
-		} catch (Exception e) {
-			LOGGER.warning(e.toString());
-		} 
-			return null;
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
+		}
+		return null;
 	}
 	
 }

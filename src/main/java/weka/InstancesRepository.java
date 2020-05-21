@@ -12,56 +12,37 @@ import weka.core.converters.ConverterUtils.DataSource;
 public class InstancesRepository {
 	
 	private Instances instances;
-	private Instances instancesFS;
 	private static final Logger LOGGER = Logger.getLogger(InstancesRepository.class.getName());
 	
 	public InstancesRepository(String file) {
 		try {
 			DataSource source1 = new DataSource(file);
 			instances = source1.getDataSet();
-			instancesFS = selectFeatures(instances);
 			
 		} catch (Exception e) {
 			LOGGER.warning(e.toString());
 		}
 	}
 	
-	public Instances getTraining(int nRevTrain, boolean useFS) {
-		Instances training;
-		if (useFS) {
-			training = new Instances(instancesFS);
-		} else {
-			training = new Instances(instances);
-		}
+	public Instances getInstances(int start, int end) {
+		Instances res = new Instances(instances);
 		
-		int numAttr = training.numAttributes();
-		training.setClassIndex(numAttr - 1);
-		removeVersionAfter(training, nRevTrain);
-		return training;
+		int numAttr = res.numAttributes();
+		res.setClassIndex(numAttr - 1);
+		removeVersionBefore(res, start);
+		removeVersionAfter(res, end);
+		return res;
 	}
 	
-	public Instances getTest(int nRevTrain, boolean useFS) {
-		Instances testing;
-		if (useFS) {
-			testing = new Instances(instancesFS);
-		} else {
-			testing = new Instances(instances);
-		}
-		int numAttr = testing.numAttributes();
-		testing.setClassIndex(numAttr - 1);
-		removeVersionUntil(testing, nRevTrain);
-		return testing;
-	}
-	
-	public void removeVersionUntil(Instances insts, int end) {
+	public static void removeVersionBefore(Instances insts, int end) {
 		for (int i = insts.numInstances() - 1; i >= 0; i--) {
-		    if (insts.get(i).value(0) <= end) {
+		    if (insts.get(i).value(0) < end) {
 		    	insts.delete(i);
 		    }
 		}
 	}
 	
-	public void removeVersionAfter(Instances insts, int start) {
+	public static void removeVersionAfter(Instances insts, int start) {
 		for (int i = insts.numInstances() - 1; i >= 0; i--) {
 		    if (insts.get(i).value(0) > start) {
 		    	insts.delete(i);
@@ -69,7 +50,7 @@ public class InstancesRepository {
 		}
 	}
 	
-	private Instances selectFeatures(Instances inst){
+	public static AttributeSelection getAttributeSelection(Instances inst){
 		AttributeSelection attSelection = new AttributeSelection();
 	    CfsSubsetEval eval = new CfsSubsetEval();
 	    BestFirst search = new BestFirst();
@@ -77,9 +58,9 @@ public class InstancesRepository {
 	    attSelection.setSearch(search);
 	    try {
 			attSelection.SelectAttributes(inst);
-			return attSelection.reduceDimensionality(inst);
+			return attSelection;
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, e.getMessage(), e);
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	    	return null;
 	}

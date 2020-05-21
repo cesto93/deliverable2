@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -14,8 +15,9 @@ import model.CSVField;
 import model.FileByRelease;
 import model.FileWithMetrics;
 import model.Release;
+import weka.CompactEvaluation;
+import weka.EvaluationOptions;
 import weka.EvaluationResult;
-import weka.classifiers.Evaluation;
 
 public class CSVExporter {
 	
@@ -75,26 +77,26 @@ public class CSVExporter {
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-				printer.printRecord("DataSet", "#TrainingRelease", "Classifier", "Feature Selection", 
-									"Precision", "Recall", "AUC", "Kappa");
+				printer.printRecord("DataSet", "#TrainingRelease", "%training", "Classifier", "Feature Selection", 
+									"TP", "FP", "TN", "FN", "Precision", "Recall", "AUC", "Kappa");
 				String dataset = result.getDateset();
-		    	String[] classifier = result.getClassifier();
-		    	Evaluation[][] eval = result.getEval();
-		    	Evaluation[][] evalFS = result.getEvalFS();
-		    	for (int i = 0; i < eval.length; i++) {
-					for (int j = 0; j < eval[i].length; j++) {
-						double precision = eval[i][j].precision(1);
-						double recall = eval[i][j].recall(1);
-						double auc = eval[i][j].areaUnderROC(1);
-						double kappa = eval[i][j].kappa();
+		    	List<Map<EvaluationOptions, CompactEvaluation>> eval = result.getEval();
+		    	for (int i = 0; i < eval.size(); i++) {
+		    		Map<EvaluationOptions, CompactEvaluation> map = eval.get(i);
+					for (EvaluationOptions key : map.keySet()) {
+						double precision =map.get(key).getPrecision();
+						double recall = map.get(key).getRecall();
+						double auc = map.get(key).getAuc();
+						double kappa = map.get(key).getKappa();
+						double tp = map.get(key).getTp();
+						double fp = map.get(key).getFp();
+						double tn =map.get(key).getTn();
+						double fn = map.get(key).getFn();
+						double perTrain = ((double) (i + 1)) / (eval.size() + 1);
 						
-						printer.printRecord(dataset, i + 1, classifier[j], "No", precision, recall, auc, kappa);
-						
-						precision = evalFS[i][j].precision(1);
-						recall = evalFS[i][j].recall(1);
-						auc = evalFS[i][j].areaUnderROC(1);
-						kappa = evalFS[i][j].kappa();
-						printer.printRecord(dataset, i + 1, classifier[j], "Best First", precision, recall, auc, kappa);
+						printer.printRecord(dataset, i + 1, perTrain, key.getClassifier().toString(), 
+											key.isFeatureSelection() ? "Best First" : "No selection", 
+											tp, fp, tn, fn, precision, recall, auc, kappa);
 					}
 				}
 		} catch (IOException e) {
