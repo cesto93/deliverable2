@@ -8,7 +8,6 @@ import java.util.logging.Logger;
 
 import weka.EvaluationOptions.MyClassifier;
 import weka.attributeSelection.AttributeSelection;
-import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.RandomForest;
@@ -29,7 +28,7 @@ public class ModelComparer {
 			int nRel = dataset.numDistinctValues(0);
 			InstancesRepository repo = new InstancesRepository(file);
 			
-			EvaluationResult result = new EvaluationResult(name, nRel - 1, 3);
+			EvaluationResult result = new EvaluationResult(name);
 			List<Map<EvaluationOptions, CompactEvaluation>> list = result.getEval();
 			
 			int classIndex = 1;
@@ -42,11 +41,11 @@ public class ModelComparer {
 				Map<EvaluationOptions, CompactEvaluation> map = new TreeMap<>();
 				
 				map.put(new EvaluationOptions(MyClassifier.RANDOMFOREST, false, false), 
-						getCompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
 				map.put(new EvaluationOptions(MyClassifier.NAIVEBAYES, false, false), 
-						getCompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
 				map.put(new EvaluationOptions(MyClassifier.IBK, false, false), 
-						 getCompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
 				
 				AttributeSelection selection = InstancesRepository.getAttributeSelection(training);
 				Instances trainingFS = selection.reduceDimensionality(training);
@@ -54,11 +53,11 @@ public class ModelComparer {
 				evalModel = new Evaluator(trainingFS, testingFS);
 				
 				map.put(new EvaluationOptions(MyClassifier.RANDOMFOREST, true, false), 
-						getCompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
 				map.put(new EvaluationOptions(MyClassifier.NAIVEBAYES, true, false), 
-						getCompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
 				map.put(new EvaluationOptions(MyClassifier.IBK, true, false), 
-						 getCompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
+						new CompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
 				
 				list.add(map);
 			}
@@ -67,18 +66,6 @@ public class ModelComparer {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 		return null;
-	}
-	
-	private static CompactEvaluation getCompactEvaluation(Evaluation eval, int classIndex) {
-		double precision = eval.precision(classIndex);
-		double recall = eval.recall(classIndex);
-		double auc = eval.areaUnderROC(classIndex);
-		double kappa = eval.kappa();
-		double tp = eval.numTruePositives(classIndex);
-		double fp = eval.numFalsePositives(classIndex);
-		double tn = eval.numTrueNegatives(classIndex);
-		double fn = eval.numFalseNegatives(classIndex);
-		return new CompactEvaluation(tp, fp, tn, fn, precision, recall, auc, kappa);
 	}
 	
 }

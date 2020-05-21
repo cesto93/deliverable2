@@ -58,10 +58,9 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        if (getClass() != obj.getClass())
-            return false;
+
         EvaluationOptions other = (EvaluationOptions) obj;
         if (classifier != other.classifier || featureSelection != other.featureSelection || 
         		overSampling != other.overSampling)

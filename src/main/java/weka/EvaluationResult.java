@@ -8,7 +8,7 @@ public class EvaluationResult {
 	private String dataset;
 	private List<Map<EvaluationOptions, CompactEvaluation>> eval;
 	
-	public EvaluationResult(String dataset, int nRelease, int nClassifier) {
+	public EvaluationResult(String dataset) {
 		this.setDateset(dataset);
 		this.eval = new ArrayList<>();
 	}

@@ -1,5 +1,7 @@
 package weka;
 
+import weka.classifiers.Evaluation;
+
 public class CompactEvaluation {
 	private double tp;
 	private double fp;
@@ -10,17 +12,15 @@ public class CompactEvaluation {
 	private double auc;
 	private double kappa;
 	
-	public CompactEvaluation(double tp, double fp, double tn, double fn, 
-								double precision, double recall, double auc, double kappa) {
-		super();
-		this.tp = tp;
-		this.fp = fp;
-		this.tn = tn;
-		this.fn = fn;
-		this.precision = precision;
-		this.recall = recall;
-		this.auc = auc;
-		this.kappa = kappa;
+	public CompactEvaluation(Evaluation eval, int classIndex) {
+		this.tp = eval.numTruePositives(classIndex);;
+		this.fp = eval.numFalsePositives(classIndex);
+		this.tn = eval.numTrueNegatives(classIndex);
+		this.fn = eval.numFalseNegatives(classIndex);
+		this.precision = eval.precision(classIndex);;
+		this.recall = eval.recall(classIndex);;
+		this.auc = eval.areaUnderROC(classIndex);;
+		this.kappa = eval.kappa();
 	}
 	
 	public double getPrecision() {
