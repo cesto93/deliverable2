@@ -62,10 +62,8 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
             return false;
 
         EvaluationOptions other = (EvaluationOptions) obj;
-        if (classifier != other.classifier || featureSelection != other.featureSelection || 
-        		overSampling != other.overSampling)
-            return false;
-        return true;
+        return (classifier == other.classifier && featureSelection == other.featureSelection &&
+        		overSampling == other.overSampling);
     }
 
 	@Override

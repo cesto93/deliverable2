@@ -13,13 +13,13 @@ public class CompactEvaluation {
 	private double kappa;
 	
 	public CompactEvaluation(Evaluation eval, int classIndex) {
-		this.tp = eval.numTruePositives(classIndex);;
+		this.tp = eval.numTruePositives(classIndex);
 		this.fp = eval.numFalsePositives(classIndex);
 		this.tn = eval.numTrueNegatives(classIndex);
 		this.fn = eval.numFalseNegatives(classIndex);
-		this.precision = eval.precision(classIndex);;
-		this.recall = eval.recall(classIndex);;
-		this.auc = eval.areaUnderROC(classIndex);;
+		this.precision = eval.precision(classIndex);
+		this.recall = eval.recall(classIndex);
+		this.auc = eval.areaUnderROC(classIndex);
 		this.kappa = eval.kappa();
 	}
 	
