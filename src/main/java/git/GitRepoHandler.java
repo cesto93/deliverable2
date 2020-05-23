@@ -16,7 +16,6 @@ public class GitRepoHandler implements GitDataProvider {
 	private Process p;
 
 	public GitRepoHandler(String repoURL, File repo) {
-		LOGGER.setLevel(Level.INFO);
 		this.repo = repo;
 		parent = repo.getParentFile();
 		if (!repoExist()) 

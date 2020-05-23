@@ -56,8 +56,6 @@ public class JIRATicketRetriever {
 		Integer total = 1;
 		ArrayList<BugTicket> tickets = new ArrayList<>();
 		
-		LOGGER.setLevel(Level.WARNING);
-		
 		//Get JSON API for closed bugs w/ AV in the project
 		do {
 			//Only gets a max of 1000 at a time, so must do this multiple times if res >1000

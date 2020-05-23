@@ -28,7 +28,6 @@ public class GitLogRetriever {
 	private GitDataProvider dataProvider;
 	
 	public GitLogRetriever(GitDataProvider dataProvider) {
-		LOGGER.setLevel(Level.INFO);
 		this.dataProvider = dataProvider;
 	}
 	
