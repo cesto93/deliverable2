@@ -1,4 +1,4 @@
-package controller;
+package launch;
 
 
 import java.io.File;
@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import controller.BugTicketRepository;
+import controller.FileByReleaseController;
+import controller.Proportion;
+import controller.ReleaseController;
 import exporter.CSVExporter;
 import git.GitLogRetriever;
 import git.GitRepoHandler;
@@ -14,16 +18,14 @@ import model.BugTicket;
 import model.FileByRelease;
 import model.ReleaseInfo;
 import utils.GetProperty;
-import weka.EvaluationResult;
-import weka.ModelComparer;
 import model.Release;
 
-public class Start {
-	private static final Logger LOGGER = Logger.getLogger(Start.class.getName());
-	private static final String[] extTaken = {".java", ".cpp"};
+public class ElaborateMetrics {
+	private static final Logger LOGGER = Logger.getLogger(ElaborateMetrics.class.getName());
+	private static final String[] extTaken = {".java"};
 	private static final String VERSIONSUF = "_VersionInfo.csv";
 	private static final String METRICSUF = "_File.csv";
-	private static final String EVALSUF = "_Evaluation.csv";
+	
 	
 	public static void main(String[] args) {
 		
@@ -33,10 +35,7 @@ public class Start {
 		final String repoPath = GetProperty.getProperty("repoPath");
 		
 		elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
-		predictBugginess(projName[0]);
-		
 		elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
-		predictBugginess(projName[1]);
 		LOGGER.log(Level.INFO, "Done");
 	}
 	
@@ -72,11 +71,6 @@ public class Start {
 		fbrController.setAge(files);
 		CSVExporter.printGitFileByRelease(files,  projName + METRICSUF);
 		LOGGER.log(Level.INFO, "Done set file metrics");
-	}
-	
-	public static void predictBugginess(String projName) {
-		EvaluationResult result = ModelComparer.compare(projName, projName + METRICSUF);
-		CSVExporter.printEvaluationResult(result, projName + EVALSUF);
 	}
 
 }

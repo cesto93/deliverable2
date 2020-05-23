@@ -6,11 +6,11 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import weka.EvaluationOptions.MyClassifier;
+import model.EvaluationOptions;
+import model.EvaluationResult;
+import model.EvaluationOptions.MyClassifier;
+import model.EvaluationOptions.MySampling;
 import weka.attributeSelection.AttributeSelection;
-import weka.classifiers.bayes.NaiveBayes;
-import weka.classifiers.lazy.IBk;
-import weka.classifiers.trees.RandomForest;
 import weka.core.Instances;
 import weka.core.converters.ConverterUtils.DataSource;
 
@@ -31,7 +31,10 @@ public class ModelComparer {
 			EvaluationResult result = new EvaluationResult(name);
 			List<Map<EvaluationOptions, CompactEvaluation>> list = result.getEval();
 			
-			int classIndex = 1;
+			final int classIndex = 1;
+			
+			MyClassifier[] myClassifiers = {MyClassifier.RANDOMFOREST, MyClassifier.NAIVEBAYES, MyClassifier.IBK};
+			MySampling[] mySamplings = {MySampling.NOSAMPLING, MySampling.OVERSAMPLING, MySampling.UNDERSAMPLING};
 			
 			for (int i = 0; i < nRel - 1; i++) {
 				Instances training = repo.getInstances(1, i + 1);
@@ -40,24 +43,26 @@ public class ModelComparer {
 				
 				Map<EvaluationOptions, CompactEvaluation> map = new TreeMap<>();
 				
-				map.put(new EvaluationOptions(MyClassifier.RANDOMFOREST, false, false), 
-						new CompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
-				map.put(new EvaluationOptions(MyClassifier.NAIVEBAYES, false, false), 
-						new CompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
-				map.put(new EvaluationOptions(MyClassifier.IBK, false, false), 
-						new CompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
+				for (MyClassifier myClassifier : myClassifiers) {
+					for (MySampling mySampling: mySamplings) {
+						EvaluationOptions evalOpts = new EvaluationOptions(myClassifier, false, mySampling);
+						map.put(evalOpts, 
+								new CompactEvaluation(evalModel.evaluateWithOptions(evalOpts), classIndex));
+					}
+				}
 				
 				AttributeSelection selection = InstancesRepository.getAttributeSelection(training);
 				Instances trainingFS = selection.reduceDimensionality(training);
 				Instances testingFS = selection.reduceDimensionality(testing);
 				evalModel = new Evaluator(trainingFS, testingFS);
 				
-				map.put(new EvaluationOptions(MyClassifier.RANDOMFOREST, true, false), 
-						new CompactEvaluation(evalModel.evaluate(new RandomForest()), classIndex));
-				map.put(new EvaluationOptions(MyClassifier.NAIVEBAYES, true, false), 
-						new CompactEvaluation(evalModel.evaluate(new NaiveBayes()), classIndex));
-				map.put(new EvaluationOptions(MyClassifier.IBK, true, false), 
-						new CompactEvaluation(evalModel.evaluate(new IBk()), classIndex));
+				for (MyClassifier myClassifier : myClassifiers) {
+					for (MySampling mySampling: mySamplings) {
+						EvaluationOptions evalOpts = new EvaluationOptions(myClassifier, true, mySampling);
+						map.put(evalOpts, 
+								new CompactEvaluation(evalModel.evaluateWithOptions(evalOpts), classIndex));
+					}
+				}
 				
 				list.add(map);
 			}

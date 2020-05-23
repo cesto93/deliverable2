@@ -1,8 +1,10 @@
-package weka;
+package model;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import weka.CompactEvaluation;
 
 public class EvaluationResult {
 	private String dataset;

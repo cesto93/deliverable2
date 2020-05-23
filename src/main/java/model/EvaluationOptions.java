@@ -1,10 +1,10 @@
-package weka;
+package model;
 
 
 public class EvaluationOptions implements Comparable<EvaluationOptions> {
 	private MyClassifier classifier;
 	private boolean featureSelection;
-	private boolean overSampling;
+	private MySampling sampling;
 	
 	public enum MyClassifier {
 		RANDOMFOREST, NAIVEBAYES, IBK;
@@ -16,11 +16,22 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
 			return names[this.ordinal()];
 		}
 	}
+	
+	public enum MySampling {
+		NOSAMPLING, OVERSAMPLING, UNDERSAMPLING, SMOTE;
+		
+		private final String[] names = new String[] {"No sampling", "Oversampling", "Undersampling", "Smote"};
+		
+		@Override
+		public String toString() {
+			return names[this.ordinal()];
+		}
+	}
 
-	public EvaluationOptions(MyClassifier classifier, boolean featureSelection, boolean overSampling) {
+	public EvaluationOptions(MyClassifier classifier, boolean featureSelection, MySampling sampling) {
 		super();
 		this.featureSelection = featureSelection;
-		this.overSampling = overSampling;
+		this.sampling = sampling;
 		this.classifier = classifier;
 	}
 
@@ -32,12 +43,12 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
 		this.featureSelection = featureSelection;
 	}
 
-	public boolean isOverSampling() {
-		return overSampling;
+	public MySampling getSampling() {
+		return sampling;
 	}
 
-	public void setOverSampling(boolean overSampling) {
-		this.overSampling = overSampling;
+	public void setSampling(MySampling sampling) {
+		this.sampling = sampling;
 	}
 
 	public MyClassifier getClassifier() {
@@ -50,8 +61,7 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
 	
 	@Override
     public int hashCode() {
-		return classifier.ordinal() * 100 + (featureSelection ? 1 : 0) * 10 
-				+ (overSampling ? 1 : 0);
+		return classifier.ordinal() * 100 + (sampling.ordinal()) * 10 + (featureSelection ? 1 : 0);
 	}
 	
 	@Override
@@ -63,7 +73,7 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
 
         EvaluationOptions other = (EvaluationOptions) obj;
         return (classifier == other.classifier && featureSelection == other.featureSelection &&
-        		overSampling == other.overSampling);
+        		sampling == other.sampling);
     }
 
 	@Override

@@ -12,12 +12,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import model.CSVField;
+import model.EvaluationOptions;
+import model.EvaluationResult;
 import model.FileByRelease;
 import model.FileWithMetrics;
 import model.Release;
 import weka.CompactEvaluation;
-import weka.EvaluationOptions;
-import weka.EvaluationResult;
 
 public class CSVExporter {
 	
@@ -77,7 +77,8 @@ public class CSVExporter {
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-				printer.printRecord("DataSet", "#TrainingRelease", "%training", "Classifier", "Feature Selection", 
+				printer.printRecord("DataSet", "#TrainingRelease", "%training", "Classifier", 
+									"Balancing", "Feature Selection", 
 									"TP", "FP", "TN", "FN", "Precision", "Recall", "AUC", "Kappa");
 				String dataset = result.getDateset();
 		    	List<Map<EvaluationOptions, CompactEvaluation>> eval = result.getEval();
@@ -94,7 +95,8 @@ public class CSVExporter {
 						double fn = map.get(key).getFn();
 						double perTrain = ((double) (i + 1)) / (eval.size() + 1);
 						
-						printer.printRecord(dataset, i + 1, perTrain, key.getClassifier().toString(), 
+						printer.printRecord(dataset, i + 1, perTrain, key.getClassifier().toString(),
+											key.getSampling().toString() ,
 											key.isFeatureSelection() ? "Best First" : "No selection", 
 											tp, fp, tn, fn, precision, recall, auc, kappa);
 					}
