@@ -34,8 +34,8 @@ public class ModelComparer {
 				Instances training = repo.getInstances(1, i + 1);
 				Instances testing = repo.getInstances(i + 2, i + 2);
 				Evaluator evalModel = new Evaluator(training, testing);
-				double defectiveTestingPerc = getDefectivePerc(training);
-				double majorityPerc = Math.max(defectiveTestingPerc, 100 - defectiveTestingPerc);
+				double defectiveTrainigPerc = getDefectivePerc(training);
+				double majorityPerc = Math.max(defectiveTrainigPerc, 100 - defectiveTrainigPerc);
 				
 				Map<EvaluationOptions, CompactEvaluation> map = new TreeMap<>();
 				
@@ -61,8 +61,9 @@ public class ModelComparer {
 				}
 				
 				result.getEval().add(map);
-				result.getDefectiveTesting().add(defectiveTestingPerc);
-				result.getDefectiveTraining().add(getDefectivePerc(training));
+				result.getDefectiveTraining().add(defectiveTrainigPerc);
+				result.getDefectiveTesting().add(getDefectivePerc(testing));
+				
 			}
 			return result;
 		} catch (Exception e) {
