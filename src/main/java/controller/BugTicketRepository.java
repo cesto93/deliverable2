@@ -32,6 +32,11 @@ public class BugTicketRepository {
 		}	
 			return new ArrayList<>(temp);
 	}	
+	
+	private LocalDate getGitLastCommitDate(BugTicket ticket) {	
+		List<String> hashes = retriever.getCommitsHash(ticket.getKey());
+		return retriever.getCommitDate(hashes.get(0));
+	}
 
 	
 	private List<String> getFileModified(List<GitCommit> commits) {
@@ -44,9 +49,6 @@ public class BugTicketRepository {
 	
 	public List<BugTicket> getBugTicket(String projName,  ReleaseInfo[] rels) {
 		List<BugTicket> tickets = JIRATicketRetriever.getBugTicket(projName);
-		removeUnkownFV(tickets, rels);
-		removeUnkownAV(tickets, rels);
-		handleMissingFV(tickets);
 		
 		StringBuilder bld = new StringBuilder();
 		int i = 0;
@@ -63,6 +65,9 @@ public class BugTicketRepository {
 		if (LOGGER.isLoggable(Level.INFO))
 			LOGGER.info("removed empty ticket: " + bld.toString());
 		
+		removeUnkownFV(tickets, rels);
+		removeUnkownAV(tickets, rels);
+		handleMissingFV(tickets, rels);
 		return tickets;
 	}
 	
@@ -88,19 +93,19 @@ public class BugTicketRepository {
 		}
 	}
 	
-	private void handleMissingFV(List<BugTicket> tickets) {
-		StringBuilder bld = new StringBuilder();
-		int i = 0;
-		while (i < tickets.size()) {
-			if (tickets.get(i).getFixedVersions().isEmpty()) {
-				bld.append(tickets.get(i).getKey() + " ");
-				tickets.remove(i);
+	//if FV is missing set it as ticket last commit version
+	private void handleMissingFV(List<BugTicket> tickets, ReleaseInfo[] rels) {
+		for (BugTicket ticket : tickets) {
+			if (ticket.getFixedVersions().isEmpty()) {
+				for (ReleaseInfo rel : rels)
+					if (rel.getDate().isAfter(this.getGitLastCommitDate(ticket).atStartOfDay())) {
+						ticket.getFixedVersions().add(rel.getVersionID());
+						if (LOGGER.isLoggable(Level.INFO))
+							LOGGER.info("add FV to ticket : " + ticket.getKey());
+						return;
+					}
 			}
-			else
-				i++;
 		}
-		if (LOGGER.isLoggable(Level.INFO))
-			LOGGER.info("removed ticket with no FV: " + bld.toString());
 	}
 	
 }

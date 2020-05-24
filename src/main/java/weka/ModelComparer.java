@@ -80,6 +80,8 @@ public class ModelComparer {
 		    }
 		    tot++;
 		}
+		if (tot == 0)
+			return -1;
 		return (((double) def) / tot) * 100;
 	}
 	
