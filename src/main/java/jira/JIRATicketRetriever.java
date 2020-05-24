@@ -34,54 +34,53 @@ public class JIRATicketRetriever {
 		return list;
 	}
 	
-	private static void addTickets(JSONArray issues, Integer start, Integer end, List<BugTicket> tickets) {
-		for (int i = start; i < end; i++) {
-			JSONObject issue = issues.getJSONObject(i%1000);
-			String key = issue.get("key").toString();
-			JSONObject fields = issue.getJSONObject("fields");
-			LocalDate date = LocalDateTime.parse(fields.get("created").toString().split("\\+")[0]).toLocalDate();
-			JSONArray versions = fields.getJSONArray("versions");
-			JSONArray fixVersions = fields.getJSONArray("fixVersions");
-			
-			if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
-				LOGGER.info(String.format("missing fixing version %s", key));
-			}
-			BugTicket bug = new BugTicket(key, toStringList(versions, "id"), toStringList(fixVersions, "id"), date);	
-			tickets.add(bug);
-		} 
+	private static BugTicket getTicket(JSONObject issue) {
+		String key = issue.get("key").toString();
+		JSONObject fields = issue.getJSONObject("fields");
+		LocalDate date = LocalDateTime.parse(fields.get("created").toString().split("\\+")[0]).toLocalDate();
+		JSONArray versions = fields.getJSONArray("versions");
+		JSONArray fixVersions = fields.getJSONArray("fixVersions");
+		
+		if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
+			LOGGER.info(String.format("missing fixing version %s", key));
+		}
+		return new BugTicket(key, toStringList(versions, "id"), toStringList(fixVersions, "id"), date);	
 	}
 	
 	public static List<BugTicket> getBugTicket(String projName) {
-		Integer i = 0;
+		Integer start = 0;
 		Integer total = 1;
-		ArrayList<BugTicket> tickets = new ArrayList<>();
+		TreeMap<LocalDate, BugTicket> tickets = new TreeMap<>();
 		
 		//Get JSON API for closed bugs w/ AV in the project
 		do {
 			//Only gets a max of 1000 at a time, so must do this multiple times if res >1000
-			Integer j = i + 1000;
+			Integer end = start + 1000;
 			String url = BASEURL + "/search?jql=project=%22" + projName 
 					+ "%22AND%22issueType%22=%22Bug%22" + "AND(%22status%22=%22closed%22OR"
 					+ "%22status%22=%22resolved%22)AND%22resolution%22=%22fixed%22" 
 					+ "&fields=key,resolutiondate,versions,fixVersions,created&startAt="
-					+ i.toString() + "&maxResults=" + j.toString();
+					+ start.toString() + "&maxResults=" + end.toString();
 			
 			try {
 				JSONObject json = JSONReader.readJsonFromUrl(url);
 				JSONArray issues = json.getJSONArray("issues");
 				total = json.getInt("total");
 				
-				//Iterate through each res
-				if (j > total)
-					addTickets(issues, i, total, tickets);
-				else
-					addTickets(issues, i, j, tickets);
-				i += 1000;
+				if (end > total)
+					end = total;
+				
+				for (int i = start; i < end; i++) {
+					JSONObject issue = issues.getJSONObject(i%1000);
+					BugTicket bug = getTicket(issue);
+					tickets.put(bug.getCreationDate(), bug);
+				}
+				start += 1000;
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
 			} 
-		} while (i < total);
-		return tickets;
+		} while (start < total);
+		return new ArrayList<>(tickets.values());
 	}
 	
 	public static List<ReleaseInfo> getReleaseInfo(String projName) {

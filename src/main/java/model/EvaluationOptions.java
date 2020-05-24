@@ -7,29 +7,36 @@ public class EvaluationOptions implements Comparable<EvaluationOptions> {
 	private MySampling sampling;
 	
 	public enum MyClassifier {
-		RANDOMFOREST, NAIVEBAYES, IBK;
+		RANDOMFOREST("Random Forest"), NAIVEBAYES("Naive Bayes") , IBK("IBk");
 		
-		private final String[] names = new String[] {"Random Forest", "Naive Bayes", "IBk"};
+		private String name;
+		
+		private MyClassifier(String name) {
+			this.name = name;
+		}
 		
 		@Override
 		public String toString() {
-			return names[this.ordinal()];
+			return name;
 		}
 	}
 	
 	public enum MySampling {
-		NOSAMPLING, OVERSAMPLING, UNDERSAMPLING, SMOTE;
+		NOSAMPLING("No sampling"), OVERSAMPLING("Oversampling"), UNDERSAMPLING("Undersampling"), SMOTE("Smote");
 		
-		private final String[] names = new String[] {"No sampling", "Oversampling", "Undersampling", "Smote"};
+		private String name;
+		
+		private MySampling(String name) {
+			this.name = name;
+		}
 		
 		@Override
 		public String toString() {
-			return names[this.ordinal()];
+			return name;
 		}
 	}
 
 	public EvaluationOptions(MyClassifier classifier, boolean featureSelection, MySampling sampling) {
-		super();
 		this.featureSelection = featureSelection;
 		this.sampling = sampling;
 		this.classifier = classifier;

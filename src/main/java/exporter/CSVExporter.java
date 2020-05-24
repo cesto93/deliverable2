@@ -47,7 +47,7 @@ public class CSVExporter {
 		}
 	}
 	
-	public static List<Object> getFieldsValues(int nRel, FileWithMetrics file, CSVField[] fields) {
+	public static List<Object> getFieldsValues(int nRel, FileWithMetrics file) {
 		ArrayList<Object> res = new ArrayList<>();
 		res.add(nRel);
 		for (int i = 1; i < fields.length; i++)
@@ -64,7 +64,7 @@ public class CSVExporter {
 		    	
 		    	for (int i = 0; i < fbr.size(); i++) {
 					for (FileWithMetrics fwm : fbr.get(i).getFiles()) {
-						printer.printRecord(getFieldsValues(i + 1, fwm, fields));
+						printer.printRecord(getFieldsValues(i + 1, fwm));
 					}
 				}
 		} catch (IOException e) {
@@ -77,28 +77,26 @@ public class CSVExporter {
 				FileWriter fw = new FileWriter(file);
 				CSVPrinter printer = new CSVPrinter(fw, CSVFormat.DEFAULT);	
 			) {
-				printer.printRecord("DataSet", "#TrainingRelease", "%training", "Classifier", 
-									"Balancing", "Feature Selection", 
+				printer.printRecord("DataSet", "#TrainingRelease", "%training", "%Defective training", "%Defective testing",  
+									"Classifier", "Balancing", "Feature Selection", 
 									"TP", "FP", "TN", "FN", "Precision", "Recall", "AUC", "Kappa");
 				String dataset = result.getDateset();
-		    	List<Map<EvaluationOptions, CompactEvaluation>> eval = result.getEval();
-		    	for (int i = 0; i < eval.size(); i++) {
-		    		Map<EvaluationOptions, CompactEvaluation> map = eval.get(i);
+		    	List<Map<EvaluationOptions, CompactEvaluation>> evals = result.getEval();
+		    	
+		    	for (int i = 0; i < evals.size(); i++) {
+		    		Map<EvaluationOptions, CompactEvaluation> map = evals.get(i);
 					for (EvaluationOptions key : map.keySet()) {
-						double precision =map.get(key).getPrecision();
-						double recall = map.get(key).getRecall();
-						double auc = map.get(key).getAuc();
-						double kappa = map.get(key).getKappa();
-						double tp = map.get(key).getTp();
-						double fp = map.get(key).getFp();
-						double tn =map.get(key).getTn();
-						double fn = map.get(key).getFn();
-						double perTrain = ((double) (i + 1)) / (eval.size() + 1);
+						CompactEvaluation eval = map.get(key);
 						
-						printer.printRecord(dataset, i + 1, perTrain, key.getClassifier().toString(),
-											key.getSampling().toString() ,
+						String perTrain = String.format("%.2f", (((double) (i + 1)) / (evals.size() + 1)) * 100);
+						String perDefTrain = String.format("%.2f", result.getDefectiveTraining().get(i));
+						String perDefTest = String.format("%.2f", result.getDefectiveTesting().get(i));
+						
+						printer.printRecord(dataset, i + 1, perTrain, perDefTrain, perDefTest,
+											key.getClassifier().toString(), key.getSampling().toString(),
 											key.isFeatureSelection() ? "Best First" : "No selection", 
-											tp, fp, tn, fn, precision, recall, auc, kappa);
+											eval.getTp(), eval.getFp(), eval.getTn(), eval.getFn(), 
+											eval.getPrecision(), eval.getRecall(), eval.getAuc(), eval.getKappa());
 					}
 				}
 		} catch (IOException e) {

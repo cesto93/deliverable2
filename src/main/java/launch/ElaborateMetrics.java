@@ -54,9 +54,6 @@ public class ElaborateMetrics {
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
 		
-		CSVExporter.printReleaseInfo(releases, projName + VERSIONSUF);
-		LOGGER.log(Level.INFO, "Done writing release");
-		
 		List<FileByRelease> files = fbrController.getFileByRelease(releases);
 		LOGGER.log(Level.INFO, "Done getting file by release");
 		
@@ -69,8 +66,10 @@ public class ElaborateMetrics {
 			fbrController.setAvgMetrics(fbr);
 		}
 		fbrController.setAge(files);
+		
+		CSVExporter.printReleaseInfo(releases, projName + VERSIONSUF);
 		CSVExporter.printGitFileByRelease(files,  projName + METRICSUF);
-		LOGGER.log(Level.INFO, "Done set file metrics");
+		LOGGER.log(Level.INFO, "Done exporting metrics and versions");
 	}
 
 }

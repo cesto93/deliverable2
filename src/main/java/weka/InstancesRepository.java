@@ -24,6 +24,14 @@ public class InstancesRepository {
 		}
 	}
 	
+	public Instances getInstances() {
+		Instances res = new Instances(instances);
+		
+		int numAttr = res.numAttributes();
+		res.setClassIndex(numAttr - 1);
+		return res;
+	}
+	
 	public Instances getInstances(int start, int end) {
 		Instances res = new Instances(instances);
 		

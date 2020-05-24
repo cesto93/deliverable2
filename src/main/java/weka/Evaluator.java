@@ -38,7 +38,7 @@ public class Evaluator {
 		return null;
 	}
 	
-	public Evaluation evaluateWithOptions(EvaluationOptions options) {
+	public Evaluation evaluateWithOptions(EvaluationOptions options, double majorityPerc) {
 		Classifier classifier;
 		switch (options.getClassifier()) {
 		case IBK:
@@ -58,7 +58,7 @@ public class Evaluator {
 		case NOSAMPLING:
 			break;
 		case OVERSAMPLING:
-			classifier = getResample(classifier, training);
+			classifier = getResample(classifier, training, majorityPerc);
 			break;
 		case SMOTE:
 			classifier = getSmote(classifier, training);
@@ -73,13 +73,15 @@ public class Evaluator {
 		return evaluate(classifier);
 	}
 	
-	public static FilteredClassifier getResample(Classifier classifier, Instances inst) {
+	public static FilteredClassifier getResample(Classifier classifier, Instances inst, double majorityPerc) {
 		try {
 			Resample resample = new Resample();
-			resample.setInputFormat(inst);
+			String[] opts = new String[]{ "-B", "1.0", "-Z", String.valueOf(majorityPerc * 2)};
+			resample.setOptions(opts);
 			FilteredClassifier fc = new FilteredClassifier();
 			fc.setFilter(resample);
 			fc.setClassifier(classifier);
+			fc.buildClassifier(inst);
 			return fc;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -92,10 +94,10 @@ public class Evaluator {
 			SpreadSubsample  spreadSubsample = new SpreadSubsample();
 			String[] opts = new String[]{ "-M", "1.0"};
 			spreadSubsample.setOptions(opts);
-			spreadSubsample.setInputFormat(inst);
 			FilteredClassifier fc = new FilteredClassifier();
 			fc.setFilter(spreadSubsample);
 			fc.setClassifier(classifier);
+			fc.buildClassifier(inst);
 			return fc;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -106,10 +108,10 @@ public class Evaluator {
 	public static FilteredClassifier getSmote(Classifier classifier, Instances inst) {
 		try {
 			SMOTE smote = new SMOTE();
-			smote.setInputFormat(inst);
 			FilteredClassifier fc = new FilteredClassifier();
 			fc.setFilter(smote);
 			fc.setClassifier(classifier);
+			fc.buildClassifier(inst);
 			return fc;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);

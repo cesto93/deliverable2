@@ -4,14 +4,19 @@ import java.util.ArrayList;
 
 public enum CSVField {
 
-	VERSION, FILENAME, BUGGY, LOC, NREVISIONS, NFIX, NAUTH, LOCTOUCHED, CHURN, AGE, AVGCHURN, LOCADDED, AVGLOCADDED;
-
-	private static final String[] names = { "Version", "File Name", "Buggy", "LOC", "NR", "NFix", "NAuth",
-			"LOC_touched", "Churn", "Age", "AVG_Churn", "LOC_added", "AVG_LOC_added" };
+	VERSION("Version"), FILENAME("File Name"), BUGGY("Buggy"), LOC("LOC"), NREVISIONS("NR"), NFIX("NFix"),
+	NAUTH("NAuth"), LOCTOUCHED("LOC_touched"), CHURN("Churn"), AGE("Age"), AVGCHURN("AVG_Churn"), 
+	LOCADDED("LOC_added"), AVGLOCADDED("AVG_LOC_added");
+	
+	private String name;
+	
+	private CSVField(String name) {
+		this.name = name;
+	}
 
 	@Override
 	public String toString() {
-		return names[this.ordinal()];
+		return name;
 	}
 
 	public static Iterable<String> getFieldsName(CSVField[] fields) {
