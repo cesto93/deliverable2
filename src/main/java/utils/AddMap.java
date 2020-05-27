@@ -8,6 +8,14 @@ public class AddMap {
 	    throw new IllegalStateException("Utility class");
 	}
 	
+	public static void maxValuesInMap(Map<String, Integer> map, String key, int inc) {
+		Integer actual = map.get(key);
+		if (actual == null)
+			map.put(key, inc);
+		else
+			map.put(key, Math.max(actual, inc));
+	}
+	
 	public static void sumValuesInMap(Map<String, Integer> map, String key, int inc) {
 		Integer actual = map.get(key);
 		if (actual == null)

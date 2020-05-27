@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public enum CSVField {
 
 	VERSION("Version"), FILENAME("File Name"), BUGGY("Buggy"), LOC("LOC"), NREVISIONS("NR"), NFIX("NFix"),
-	NAUTH("NAuth"), LOCTOUCHED("LOC_touched"), CHURN("Churn"), AGE("Age"), AVGCHURN("AVG_Churn"), 
-	LOCADDED("LOC_added"), AVGLOCADDED("AVG_LOC_added");
+	NAUTH("NAuth"), LOCTOUCHED("LOC_touched"), CHURN("Churn"), MAXCHURN("MAX_Churn"), AVGCHURN("AVG_Churn"), 
+	LOCADDED("LOC_added"), MAXLOCADDED("MAX_LOC_added"), AVGLOCADDED("AVG_LOC_added"), AGE("Age");
 	
 	private String name;
 	

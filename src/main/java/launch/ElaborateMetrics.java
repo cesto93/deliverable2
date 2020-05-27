@@ -34,7 +34,9 @@ public class ElaborateMetrics {
 		final String[] repoDir = {GetProperty.getProperty("repoDir1"), GetProperty.getProperty("repoDir2")};
 		final String repoPath = GetProperty.getProperty("repoPath");
 		
+		LOGGER.log(Level.INFO,projName[0]);
 		elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
+		LOGGER.log(Level.INFO,projName[1]);
 		elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
 		LOGGER.log(Level.INFO, "Done");
 	}
@@ -55,15 +57,13 @@ public class ElaborateMetrics {
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
 		
 		List<FileByRelease> files = fbrController.getFileByRelease(releases);
-		LOGGER.log(Level.INFO, "Done getting file by release");
 		
 		for (FileByRelease fbr : files) {
 			FileByReleaseController.setFileBuggy(fbr);
 			fbrController.setLoc(fbr);
 			fbrController.setnRevisions(fbr);
 			fbrController.setnAuth(fbr);
-			fbrController.setLocTouchedAndChurn(fbr);
-			fbrController.setAvgMetrics(fbr);
+			fbrController.setLocTouchedAddedChurn(fbr);
 		}
 		fbrController.setAge(files);
 		

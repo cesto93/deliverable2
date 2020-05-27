@@ -1,8 +1,11 @@
 package controller;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,6 +70,7 @@ public class BugTicketRepository {
 		
 		removeUnkownFV(tickets, rels);
 		removeUnkownAV(tickets, rels);
+		removeBadFV(tickets, rels);
 		handleMissingFV(tickets, rels);
 		return tickets;
 	}
@@ -90,6 +94,18 @@ public class BugTicketRepository {
 		
 		for (BugTicket ticket : tickets) {
 			ticket.getFixedVersions().removeIf(fv -> !relIds.contains(fv));
+		}
+	}
+	
+	// remove fv that have a date previous of the ticket creation
+	public static void removeBadFV(List<BugTicket> tickets, ReleaseInfo[] rels) {
+		Map<String, LocalDateTime> relDates = new HashMap<>();
+		for (ReleaseInfo rel : rels) {
+			relDates.put(rel.getVersionID(), rel.getDate());
+		}
+		
+		for (BugTicket ticket : tickets) {
+			ticket.getFixedVersions().removeIf(fv -> relDates.get(fv).isBefore(ticket.getCreationDate().atStartOfDay()));
 		}
 	}
 	

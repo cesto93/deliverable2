@@ -15,7 +15,9 @@ public class PredictBuggyness {
 
 	public static void main(String[] args) {
 		final String[] projName = {GetProperty.getProperty("projectName1"), GetProperty.getProperty("projectName2")};
+		LOGGER.info(projName[0]);
 		predictBugginess(projName[0]);
+		LOGGER.info(projName[1]);
 		predictBugginess(projName[1]);
 		LOGGER.log(Level.INFO, "Done");
 	}

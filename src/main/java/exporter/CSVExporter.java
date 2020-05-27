@@ -24,7 +24,8 @@ public class CSVExporter {
 	private static final Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
 	private static final CSVField[] fields = new CSVField[]{ CSVField.VERSION, CSVField.FILENAME, 
 					CSVField.LOC, CSVField.LOCTOUCHED, CSVField.NREVISIONS, CSVField.NAUTH, CSVField.LOCADDED, 
-					CSVField.AVGLOCADDED, CSVField.CHURN, CSVField.AVGCHURN, CSVField.AGE, CSVField.BUGGY};
+					CSVField.MAXLOCADDED, CSVField.AVGLOCADDED, CSVField.CHURN, CSVField.MAXCHURN, CSVField.AVGCHURN, 
+					CSVField.AGE, CSVField.BUGGY};
 	
 	private CSVExporter() {
 	    throw new IllegalStateException("Utility class");
@@ -85,12 +86,12 @@ public class CSVExporter {
 		    	
 		    	for (int i = 0; i < evals.size(); i++) {
 		    		Map<EvaluationOptions, CompactEvaluation> map = evals.get(i);
+		    		String perTrain = String.format("%.2f", (((double) (i + 1)) / (evals.size() + 1)) * 100);
+		    		String perDefTrain = String.format("%.2f", result.getDefectiveTraining().get(i));
+					String perDefTest = String.format("%.2f", result.getDefectiveTesting().get(i));
+					
 					for (EvaluationOptions key : map.keySet()) {
-						CompactEvaluation eval = map.get(key);
-						
-						String perTrain = String.format("%.2f", (((double) (i + 1)) / (evals.size() + 1)) * 100);
-						String perDefTrain = String.format("%.2f", result.getDefectiveTraining().get(i));
-						String perDefTest = String.format("%.2f", result.getDefectiveTesting().get(i));
+						CompactEvaluation eval = map.get(key);	
 						
 						printer.printRecord(dataset, i + 1, perTrain, perDefTrain, perDefTest,
 											key.getClassifier().toString(), key.getSampling().toString(),

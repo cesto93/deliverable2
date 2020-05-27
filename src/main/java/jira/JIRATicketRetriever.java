@@ -40,10 +40,6 @@ public class JIRATicketRetriever {
 		LocalDate date = LocalDateTime.parse(fields.get("created").toString().split("\\+")[0]).toLocalDate();
 		JSONArray versions = fields.getJSONArray("versions");
 		JSONArray fixVersions = fields.getJSONArray("fixVersions");
-		
-		if (LOGGER.isLoggable(Level.INFO) || fixVersions.length() == 0) {
-			LOGGER.info(String.format("missing fixing version %s", key));
-		}
 		return new BugTicket(key, toStringList(versions, "id"), toStringList(fixVersions, "id"), date);	
 	}
 	

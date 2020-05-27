@@ -28,7 +28,7 @@ public class ModelComparer {
 			EvaluationResult result = new EvaluationResult(name);
 			MyClassifier[] myClassifiers = {MyClassifier.RANDOMFOREST, MyClassifier.NAIVEBAYES, MyClassifier.IBK};
 			MySampling[] mySamplings = {MySampling.NOSAMPLING, MySampling.OVERSAMPLING, MySampling.UNDERSAMPLING ,
-										};
+										MySampling.SMOTE};
 			
 			for (int i = 0; i < nRel - 1; i++) {
 				Instances training = repo.getInstances(1, i + 1);

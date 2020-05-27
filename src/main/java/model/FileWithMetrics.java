@@ -60,6 +60,10 @@ public class FileWithMetrics extends GitFile {
 		addMetric(CSVField.LOCADDED, locAdded);
 	}
 	
+	public void setMaxLocAdded(int maxLocAdded) {
+		addMetric(CSVField.MAXLOCADDED, maxLocAdded);
+	}
+	
 	public void setAvgLocAdded(int avgLocAdded) {
 		addMetric(CSVField.AVGLOCADDED, avgLocAdded);
 	}
@@ -70,6 +74,10 @@ public class FileWithMetrics extends GitFile {
 	
 	public void setChurn(int churn) {
 		addMetric(CSVField.CHURN, churn);
+	}
+	
+	public void setMaxChurn(int maxChurn) {
+		addMetric(CSVField.MAXCHURN, maxChurn);
 	}
 	
 	public void setAvgChurn(int avgChurn) {

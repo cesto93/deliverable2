@@ -94,40 +94,49 @@ public class FileByReleaseController {
 		}
 	}
 	
-	public void setLocTouchedAndChurn(FileByRelease fbr) {
+	public void setLocTouchedAddedChurn(FileByRelease fbr) {
 		HashMap<String, Integer> added = new HashMap<>();
 		HashMap<String, Integer> touched = new HashMap<>();
 		HashMap<String, Integer> churn = new HashMap<>();
+		HashMap<String, Integer> maxAdded = new HashMap<>();
+		HashMap<String, Integer> maxChurn = new HashMap<>();
 		for (GitCommit commit : fbr.getRelease().getCommits()) {
 			for(String fileName : retriever.getFilesModifiedByCommit(commit.getHash(), extTaken)) {
 				int[] query = retriever.getLOCaddedAndDeleted(fileName, commit.getHash());
 				int incAdded = query[0];
 				int incTouched = query[0] + query[1];
 				int incChurn = query[0] - query[1];
+				
 				AddMap.sumValuesInMap(added, fileName, incAdded);
 				AddMap.sumValuesInMap(touched, fileName, incTouched);
 				AddMap.sumValuesInMap(churn, fileName, incChurn);
+				
+				AddMap.maxValuesInMap(maxAdded, fileName, incAdded);
+				AddMap.maxValuesInMap(maxChurn, fileName, incChurn);
 			}
 		}
 		for (FileWithMetrics file : fbr.getFiles()) {
 			file.setLocAdded(AddMap.getValuesInMap(added, file.getName()));
 			file.setLocTouched(AddMap.getValuesInMap(touched, file.getName()));
 			file.setChurn(AddMap.getValuesInMap(churn, file.getName()));
+			
+			file.setMaxLocAdded(AddMap.getValuesInMap(maxAdded, file.getName()));
+			file.setMaxChurn(AddMap.getValuesInMap(maxChurn, file.getName()));
+			
+			setAvgMetrics(file);
 		}
 	}
 	
 	//needs nRevision, Churn, LocAdded to be setted
-	public void setAvgMetrics(FileByRelease fbr) {
-		for (FileWithMetrics file :fbr.getFiles()) {
-			if (file.getnRevisions() != 0) {
-				file.setAvgChurn(file.getChurn() / file.getnRevisions());
-				file.setAvgLocAdded((file.getLocAdded() / file.getnRevisions()));
-			}
-			else
-			{
-				file.setAvgChurn(0);
-				file.setAvgLocAdded(0);
-			}
+	private void setAvgMetrics(FileWithMetrics file) {
+		if (file.getnRevisions() != 0) {
+			file.setAvgChurn(file.getChurn() / file.getnRevisions());
+			file.setAvgLocAdded((file.getLocAdded() / file.getnRevisions()));
+		}
+		else
+		{
+			file.setAvgChurn(0);
+			file.setAvgLocAdded(0);
 		}
 	}
 	
