@@ -5,6 +5,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import model.CompactEvaluation;
 import model.EvaluationOptions;
 import model.EvaluationResult;
 import model.EvaluationOptions.MyClassifier;

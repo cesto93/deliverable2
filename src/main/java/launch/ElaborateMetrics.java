@@ -64,6 +64,7 @@ public class ElaborateMetrics {
 			fbrController.setnRevisions(fbr);
 			fbrController.setnAuth(fbr);
 			fbrController.setLocTouchedAddedChurn(fbr);
+			fbrController.setNFix(fbr, bugs);
 		}
 		fbrController.setAge(files);
 		

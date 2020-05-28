@@ -7,7 +7,7 @@ public class BugTicket {
 	private String key;
 	private List<String> affectedVersions;
 	private List<String> fixedVersions;
-	private List<String> fileNames;
+	private List<GitCommit> commits;
 	private LocalDate creationDate;
 	
 	public BugTicket(String key, List<String> affectedVersions, List<String> fixedVersions, LocalDate creationDate) {
@@ -53,19 +53,19 @@ public class BugTicket {
 		return bld.toString();
 	}
 
-	public List<String> getFileNames() {
-		return fileNames;
-	}
-
-	public void setFileNames(List<String> fileNames) {
-		this.fileNames = fileNames;
-	}
-
 	public LocalDate getCreationDate() {
 		return creationDate;
 	}
 
 	public void setCreationDate(LocalDate resolutionDate) {
 		this.creationDate = resolutionDate;
+	}
+
+	public List<GitCommit> getCommits() {
+		return commits;
+	}
+
+	public void setCommits(List<GitCommit> commits) {
+		this.commits = commits;
 	}
 }

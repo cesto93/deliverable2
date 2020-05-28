@@ -26,33 +26,9 @@ public class BugTicketRepository {
 		this.extTaken = extTaken;
 	}
 	
-	private List<GitCommit> getGitCommits(BugTicket ticket) {	
-		List<String> hashes = retriever.getCommitsHash(ticket.getKey());
-		ArrayList<GitCommit> temp = new ArrayList<>();
-		for (String hash : hashes) {
-			LocalDate date = retriever.getCommitDate(hash);
-			temp.add(new GitCommit(hash, date));
-		}	
-			return new ArrayList<>(temp);
-	}	
-	
-	private LocalDate getGitLastCommitDate(BugTicket ticket) {	
-		List<String> hashes = retriever.getCommitsHash(ticket.getKey());
-		return retriever.getCommitDate(hashes.get(0));
-	}
-
-	
-	private List<String> getFileModified(List<GitCommit> commits) {
-		ArrayList<String> fileNames = new ArrayList<>(); 
-		for (GitCommit commit : commits) {
-				fileNames.addAll(retriever.getFilesModifiedByCommit(commit.getHash(), extTaken));
-		}
-		return fileNames;
-	}
 	
 	public List<BugTicket> getBugTicket(String projName,  ReleaseInfo[] rels) {
 		List<BugTicket> tickets = JIRATicketRetriever.getBugTicket(projName);
-		
 		StringBuilder bld = new StringBuilder();
 		int i = 0;
 		while(i < tickets.size()) {
@@ -61,7 +37,8 @@ public class BugTicketRepository {
 				bld.append(tickets.get(i).getKey() + " ");
 				tickets.remove(i);
 			} else {
-				tickets.get(i).setFileNames(getFileModified(commits));
+				tickets.get(i).setCommits(commits);
+				setFileModified(commits);
 				i++;
 			}
 		}
@@ -73,6 +50,22 @@ public class BugTicketRepository {
 		removeBadFV(tickets, rels);
 		handleMissingFV(tickets, rels);
 		return tickets;
+	}
+	
+	private List<GitCommit> getGitCommits(BugTicket ticket) {	
+		List<String> hashes = retriever.getCommitsHash(ticket.getKey());
+		ArrayList<GitCommit> temp = new ArrayList<>();
+		for (String hash : hashes) {
+			LocalDate date = retriever.getCommitDate(hash);
+			temp.add(new GitCommit(hash, date));
+		}	
+			return new ArrayList<>(temp);
+	}	
+	
+	private void setFileModified(List<GitCommit> commits) {
+		for (GitCommit commit : commits) {
+				commit.setFileNames(retriever.getFilesModifiedByCommit(commit.getHash(), extTaken));
+		}
 	}
 	
 	public static void removeUnkownAV(List<BugTicket> tickets, ReleaseInfo[] rels) {
@@ -113,13 +106,16 @@ public class BugTicketRepository {
 	private void handleMissingFV(List<BugTicket> tickets, ReleaseInfo[] rels) {
 		for (BugTicket ticket : tickets) {
 			if (ticket.getFixedVersions().isEmpty()) {
-				for (ReleaseInfo rel : rels)
-					if (rel.getDate().isAfter(this.getGitLastCommitDate(ticket).atStartOfDay())) {
+				for (ReleaseInfo rel : rels) {
+					List<String> hashes = retriever.getCommitsHash(ticket.getKey());
+					LocalDate lastCommitDate =  retriever.getCommitDate(hashes.get(0));
+					if (rel.getDate().isAfter(lastCommitDate.atStartOfDay())) {
 						ticket.getFixedVersions().add(rel.getVersionID());
 						if (LOGGER.isLoggable(Level.INFO))
 							LOGGER.info("add FV to ticket : " + ticket.getKey());
 						return;
 					}
+				}
 			}
 		}
 	}

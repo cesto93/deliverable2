@@ -12,20 +12,20 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import model.CSVField;
+import model.CompactEvaluation;
 import model.EvaluationOptions;
 import model.EvaluationResult;
 import model.FileByRelease;
 import model.FileWithMetrics;
 import model.Release;
-import weka.CompactEvaluation;
 
 public class CSVExporter {
 	
 	private static final Logger LOGGER = Logger.getLogger(CSVExporter.class.getName());
 	private static final CSVField[] fields = new CSVField[]{ CSVField.VERSION, CSVField.FILENAME, 
-					CSVField.LOC, CSVField.LOCTOUCHED, CSVField.NREVISIONS, CSVField.NAUTH, CSVField.LOCADDED, 
-					CSVField.MAXLOCADDED, CSVField.AVGLOCADDED, CSVField.CHURN, CSVField.MAXCHURN, CSVField.AVGCHURN, 
-					CSVField.AGE, CSVField.BUGGY};
+					CSVField.LOC, CSVField.LOCTOUCHED, CSVField.NREVISIONS, CSVField.NFIX, CSVField.NAUTH, 
+					CSVField.LOCADDED, CSVField.MAXLOCADDED, CSVField.AVGLOCADDED, CSVField.CHURN, CSVField.MAXCHURN, 
+					CSVField.AVGCHURN, CSVField.AGE, CSVField.BUGGY};
 	
 	private CSVExporter() {
 	    throw new IllegalStateException("Utility class");

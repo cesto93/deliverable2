@@ -66,10 +66,22 @@ public class InstancesRepository {
 	    attSelection.setSearch(search);
 	    try {
 			attSelection.SelectAttributes(inst);
+			if (LOGGER.isLoggable(Level.INFO))
+				logAttributeSelected(attSelection, inst);
 			return attSelection;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	    	return null;
+	}
+	
+	private static void logAttributeSelected(AttributeSelection attSelection, Instances inst) throws Exception {
+		int[] attributes = attSelection.selectedAttributes();
+		StringBuilder bld = new StringBuilder();
+		bld.append("Attributes selected: ");
+		for (int attribute : attributes) {
+			bld.append(inst.attribute(attribute).name() + " ");
+		}
+		LOGGER.info(bld.toString());
 	}
 }

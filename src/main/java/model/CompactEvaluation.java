@@ -1,4 +1,4 @@
-package weka;
+package model;
 
 import weka.classifiers.Evaluation;
 

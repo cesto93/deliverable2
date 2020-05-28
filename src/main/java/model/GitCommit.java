@@ -1,10 +1,12 @@
 package model;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class GitCommit  {
 	private String hash;
 	private LocalDate date;
+	private List<String> fileNames; 
 	
 	public GitCommit(String hash, LocalDate date) {
 		this.setHash(hash);
@@ -35,6 +37,27 @@ public class GitCommit  {
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
+
+	public List<String> getFileNames() {
+		return fileNames;
+	}
+
+	public void setFileNames(List<String> fileNames) {
+		this.fileNames = fileNames;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+
+        GitCommit other = (GitCommit) obj;
+        return this.hash.equals(other.getHash());
+	}
+	
+	
 	
 }
 

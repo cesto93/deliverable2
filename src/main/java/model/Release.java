@@ -1,11 +1,13 @@
 package model;
 
+import java.util.List;
+
 public class Release {
 	private ReleaseInfo releaseInfo;
-	private GitCommit[] commits;
+	private List<GitCommit> commits;
 	private BugTicket[] bugs;
 	
-	public Release(ReleaseInfo releaseInfo, GitCommit[] commits, BugTicket[] bugs) {
+	public Release(ReleaseInfo releaseInfo, List<GitCommit> commits, BugTicket[] bugs) {
 		this.releaseInfo = releaseInfo;
 		this.commits = commits;
 		this.bugs = bugs;
@@ -17,10 +19,10 @@ public class Release {
 	public void setRelease(ReleaseInfo releaseInfo) {
 		this.releaseInfo = releaseInfo;
 	}
-	public GitCommit[] getCommits() {
+	public List<GitCommit> getCommits() {
 		return commits;
 	}
-	public void setCommits(GitCommit[] commits) {
+	public void setCommits(List<GitCommit> commits) {
 		this.commits = commits;
 	}
 
@@ -33,9 +35,9 @@ public class Release {
 	}
 	
 	public GitCommit getLastCommit() {
-		if (this.getCommits().length == 0)
+		if (this.getCommits().isEmpty())
 			return null;
-		return this.getCommits()[0];
+		return this.getCommits().get(0);
 	}
 	
 }

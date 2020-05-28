@@ -26,8 +26,8 @@ public class ReleaseController {
 		while(i < relInfo.size()) {
 			String after = relInfo.get(i - 1).getDate().toLocalDate().toString();
 			String before = relInfo.get(i).getDate().toLocalDate().toString();
-			GitCommit[] commits = getCommits(retriever.getCommitsHashByDate(before, after));
-			if (commits.length == 0) {
+			List<GitCommit> commits = getCommits(retriever.getCommitsHashByDate(before, after));
+			if (commits.isEmpty()) {
 				LOGGER.warning("Release " + relInfo.get(i).getVersionName() + " has no commit");
 				relInfo.remove(i);
 			}
@@ -40,14 +40,14 @@ public class ReleaseController {
 	
 	public Release[] getRelease(ReleaseInfo[] relInfo, List<BugTicket> bugs) {	
 		List<Release> releases = new ArrayList<>(relInfo.length);
-		GitCommit[] commits = getCommits(retriever.getCommitsHashByDate(relInfo[0].getDate().toLocalDate().toString()));
+		List<GitCommit> commits = getCommits(retriever.getCommitsHashByDate(relInfo[0].getDate().toLocalDate().toString()));
 		releases.add(new Release(relInfo[0], commits, getBugByRelease(relInfo[0], bugs)));
 		
 		for (int i = 1; i < relInfo.length; i++) {
 			String after = relInfo[i - 1].getDate().toLocalDate().toString();
 			String before = relInfo[i].getDate().toLocalDate().toString();
 			commits = getCommits(retriever.getCommitsHashByDate(before, after));
-			if (commits.length != 0) {
+			if (!commits.isEmpty()) {
 				releases.add(new Release(relInfo[i], commits, getBugByRelease(relInfo[i], bugs)));
 			} else {
 				LOGGER.warning("Release " + relInfo[i].getVersionName() + " has no commit");
@@ -57,14 +57,14 @@ public class ReleaseController {
 		return releases.toArray(new Release[0]);
 	}
 	
-	private GitCommit[] getCommits(List<String> hashes) {
+	private List<GitCommit> getCommits(List<String> hashes) {
 		List<GitCommit> commits = new ArrayList<>();
 		for (String hash : hashes) {
 			LocalDate date = retriever.getCommitDate(hash);
 			commits.add(new GitCommit(hash, date));
 		}
 		
-		return commits.toArray(new GitCommit[0]);
+		return commits;
 	}
 	
 	private BugTicket[] getBugByRelease(ReleaseInfo release, List<BugTicket> tickets) {

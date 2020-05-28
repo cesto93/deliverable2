@@ -49,8 +49,10 @@ public class FileByReleaseController {
 	public static void setFileBuggy(FileByRelease fbr) {
 		for (BugTicket bug : fbr.getRelease().getBugs()) { 
 			for (FileWithMetrics file : fbr.getFiles()) {
-				if (!file.isBuggy() && bug.getFileNames().contains(file.getName())) {
-					file.setBuggy(true);
+				for (GitCommit commit : bug.getCommits()) {
+					if (!file.isBuggy() && commit.getFileNames().contains(file.getName())) {
+						file.setBuggy(true);
+					}
 				}
 			}
 		}
@@ -153,6 +155,21 @@ public class FileByReleaseController {
 				long age = creationDate.until(releaseDate, ChronoUnit.WEEKS);
 				file.setAge((int) age);
 			}
+		}
+	}
+	
+	public void setNFix(FileByRelease fbr, List<BugTicket> bugs) {
+		for (FileWithMetrics file :fbr.getFiles()) {
+			int nFix = 0;
+			for (BugTicket bug : bugs) {
+				for (GitCommit bugCommit : bug.getCommits()) {
+					if (fbr.getRelease().getCommits().contains(bugCommit) &&
+							bugCommit.getFileNames().contains(file.getName())) {
+						nFix++;
+					}
+				}
+			}
+			file.setnFix(nFix);
 		}
 	}
 	

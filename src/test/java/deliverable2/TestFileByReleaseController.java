@@ -24,10 +24,10 @@ public class TestFileByReleaseController {
 	
 	@Before
 	public void setUp() {
-		GitCommit[] commits = new GitCommit[3];
-		commits[0] = new GitCommit("aaa");
-		commits[1] = new GitCommit("bbb");
-		commits[2] = new GitCommit("ccc");
+		List<GitCommit> commits = new ArrayList<>();
+		commits.add(new GitCommit("aaa"));
+		commits.add(new GitCommit("bbb"));
+		commits.add(new GitCommit("ccc"));
 		
 		List<List<String>> filesByCommit = new ArrayList<>();
 		for (int i = 0; i < 3; i++) {
