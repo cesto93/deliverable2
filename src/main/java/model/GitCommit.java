@@ -56,6 +56,11 @@ public class GitCommit  {
         GitCommit other = (GitCommit) obj;
         return this.hash.equals(other.getHash());
 	}
+
+	@Override
+	public int hashCode() {
+		return this.getHash().hashCode();
+	}
 	
 	
 	
