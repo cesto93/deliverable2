@@ -48,10 +48,12 @@ public class ElaborateMetrics {
 		FileByReleaseController fbrController = new FileByReleaseController(retriever, extTaken);
 		
 		ReleaseInfo[] relsInfo = relController.getReleaseInfo(projName);
-		LOGGER.log(Level.INFO, "Done getting release");
+			
 		List<BugTicket> bugs = bugRepo.getBugTicket(projName, relsInfo);
 		Proportion.addMissingAV(bugs, relsInfo);
-		LOGGER.log(Level.INFO, "Done getting bug tickets and commits");
+		if (LOGGER.isLoggable(Level.INFO)) {
+			LOGGER.log(Level.INFO, "Found bug tickets: " + bugs.size() + "\nFound release: " + relsInfo.length);
+		}
 		
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		Release[] releases =  relController.getRelease(relsInfo, bugs);

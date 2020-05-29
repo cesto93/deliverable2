@@ -99,7 +99,11 @@ public class Proportion {
 			} else {
 				if (!mean.isEmpty()) {
 					double p = mean.getMean();
-					int iv = (int) ((fv - ov) * p);
+					int iv = (int) (fv -  ((fv - ov) * p));
+					if (iv < 0) {
+						iv = 0;
+					}
+					LOGGER.info("IV " + iv + " FV " + fv + " OV " + ov + "\nP from mean is " + p);
 					addAV(ticket, iv, fv, releases);
 				} else {
 					addAV(ticket, ov, fv, releases);

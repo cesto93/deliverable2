@@ -31,10 +31,6 @@ public class GitLogRetriever {
 		this.dataProvider = dataProvider;
 	}
 	
-	private static String grep(String key) {
-		return GREP + key + ":";
-	}
-	
 	private static boolean endsWith(String s, String[] keys) {
 		for (String key : keys) {
 			if (s.endsWith(key))
@@ -82,7 +78,23 @@ public class GitLogRetriever {
 	}
 	
 	public List<String> getCommitsHash(String key) {
-		return getCommitsHashBase("git", "log", ONELINE, grep(key));
+		ArrayList<String> commits = new ArrayList<>();
+		try {
+			BufferedReader stdInput = dataProvider.getResultStream("git", "log", ONELINE, GREP + key + "[^0-9]");
+			for (String line = stdInput.readLine() ; line!=null; line = stdInput.readLine()) {
+					String hash = line.split(" ")[0];
+					String msg = line.substring(hash.length()).trim().split(" ")[0];
+					
+					if (msg.contains(key))
+						commits.add(hash);
+					else
+						LOGGER.info("found: " + msg + " key: " + key);
+			}
+			} catch (Exception e) {
+				LOGGER.log(Level.SEVERE, e.getMessage(), e);
+				Thread.currentThread().interrupt();
+		}
+		return commits;
 	}
 	
 	public List<GitFile> getFiles(String hash, String[] extTaken) {
