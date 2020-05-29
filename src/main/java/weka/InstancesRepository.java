@@ -62,9 +62,11 @@ public class InstancesRepository {
 		AttributeSelection attSelection = new AttributeSelection();
 	    CfsSubsetEval eval = new CfsSubsetEval();
 	    BestFirst search = new BestFirst();
-	    attSelection.setEvaluator(eval);
-	    attSelection.setSearch(search);
 	    try {
+		    String[] opts = new String[]{ "-D", "2", "-N", String.valueOf(inst.numAttributes() - 1)};
+		    search.setOptions(opts);
+		    attSelection.setEvaluator(eval);
+		    attSelection.setSearch(search);
 			attSelection.SelectAttributes(inst);
 			logAttributeSelected(attSelection, inst);
 			return attSelection;
