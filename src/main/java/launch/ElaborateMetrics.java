@@ -34,11 +34,11 @@ public class ElaborateMetrics {
 		final String[] repoDir = {GetProperty.getProperty("repoDir1"), GetProperty.getProperty("repoDir2")};
 		final String repoPath = GetProperty.getProperty("repoPath");
 		
-		LOGGER.log(Level.INFO,projName[0]);
+		LOGGER.info(projName[0]);
 		elaborateMetrics(projName[0], urlProj[0], new File(repoPath, repoDir[0]));
-		LOGGER.log(Level.INFO,projName[1]);
+		LOGGER.info(projName[1]);
 		elaborateMetrics(projName[1], urlProj[1], new File(repoPath, repoDir[1]));
-		LOGGER.log(Level.INFO, "Done");
+		LOGGER.info("Done");
 	}
 	
 	private static void elaborateMetrics(String projName, String urlProj, File repoPathProj) {
@@ -72,7 +72,7 @@ public class ElaborateMetrics {
 		
 		CSVExporter.printReleaseInfo(releases, projName + VERSIONSUF);
 		CSVExporter.printGitFileByRelease(files,  projName + METRICSUF);
-		LOGGER.log(Level.INFO, "Done exporting metrics and versions");
+		LOGGER.info("Done exporting metrics and versions");
 	}
 
 }
