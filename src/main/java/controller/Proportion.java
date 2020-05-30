@@ -91,8 +91,9 @@ public class Proportion {
 			Integer ov = getOV(ticket.getCreationDate(), releases);
 			Integer fv = getFV(ticket, releases);
 			if ((ov == null) || (fv == null) || (fv <= ov)) {
-				if (LOGGER.isLoggable(Level.WARNING) && fv!= null && !fv.equals(ov))
-					LOGGER.warning(String.format("Not valid FV: %d date: %s OV: %d", fv, ticket.getCreationDate(), ov));
+				if (fv!= null && !fv.equals(ov))
+					LOGGER.warning(() -> 
+									String.format("Not valid FV: %d date: %s OV: %d", fv, ticket.getCreationDate(), ov));
 				continue;
 			}
 			if (ticket.getAffectedVersions().size() != 0) {
