@@ -20,7 +20,7 @@ public class InstancesRepository {
 			instances = source1.getDataSet();
 			
 		} catch (Exception e) {
-			LOGGER.warning(e.toString());
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
 	}
 	
@@ -68,7 +68,7 @@ public class InstancesRepository {
 		    attSelection.setEvaluator(eval);
 		    attSelection.setSearch(search);
 			attSelection.SelectAttributes(inst);
-			logAttributeSelected(attSelection, inst);
+			LOGGER.info(() -> logAttributeSelected(attSelection, inst));
 			return attSelection;
 		} catch (Exception e) {
 			LOGGER.log(Level.SEVERE, e.getMessage(), e);
@@ -76,15 +76,18 @@ public class InstancesRepository {
 	    	return null;
 	}
 	
-	private static void logAttributeSelected(AttributeSelection attSelection, Instances inst) throws Exception {
-		if (LOGGER.isLoggable(Level.INFO)) {
+	private static String logAttributeSelected(AttributeSelection attSelection, Instances inst) {
+		try {
 			int[] attributes = attSelection.selectedAttributes();
 			StringBuilder bld = new StringBuilder();
 			bld.append("Attributes selected: ");
 			for (int attribute : attributes) {
 				bld.append(inst.attribute(attribute).name() + " ");
 			}
-			LOGGER.info(bld.toString());
+			return bld.toString();
+		} catch (Exception e) {
+			LOGGER.log(Level.SEVERE, e.getMessage(), e);
 		}
+		return "";
 	}
 }

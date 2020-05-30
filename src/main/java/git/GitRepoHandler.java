@@ -31,7 +31,7 @@ public class GitRepoHandler implements GitDataProvider {
 	
 	//no checkout
 	private void createRepo(String repoURL) {
-		LOGGER.log(Level.INFO, "creating repo");
+		LOGGER.info("creating repo");
 		ProcessBuilder pb = new ProcessBuilder( "git", "clone", repoURL, "-n");
 		pb.directory(parent);
 		try {

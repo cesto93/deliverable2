@@ -1,6 +1,5 @@
 package launch;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import exporter.CSVExporter;
@@ -19,7 +18,7 @@ public class PredictBuggyness {
 		predictBugginess(projName[0]);
 		LOGGER.info(projName[1]);
 		predictBugginess(projName[1]);
-		LOGGER.log(Level.INFO, "Done");
+		LOGGER.info("Done");
 	}
 	
 	public static void predictBugginess(String projName) {
