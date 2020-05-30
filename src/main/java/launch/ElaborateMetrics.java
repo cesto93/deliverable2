@@ -4,7 +4,6 @@ package launch;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import controller.BugTicketRepository;
@@ -51,12 +50,11 @@ public class ElaborateMetrics {
 			
 		List<BugTicket> bugs = bugRepo.getBugTicket(projName, relsInfo);
 		Proportion.addMissingAV(bugs, relsInfo);
-		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.info("Found bug tickets: " + bugs.size() + "\nFound release: " + relsInfo.length);
-		}
+		LOGGER.info(() -> String.format("Found bug tickets: %s", bugs.size()));
 		
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions
 		Release[] releases =  relController.getRelease(relsInfo, bugs);
+		LOGGER.info(() -> String.format("Found release: %s", releases.length));
 		
 		List<FileByRelease> files = fbrController.getFileByRelease(releases);
 		

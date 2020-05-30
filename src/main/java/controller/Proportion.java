@@ -3,7 +3,6 @@ package controller;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import model.BugTicket;
@@ -70,16 +69,14 @@ public class Proportion {
 		for (int i = iv; i < fv; i++) {
 			affectedVersions.add(releases[i].getVersionID());
 		}
-		if (LOGGER.isLoggable(Level.INFO))
-			LOGGER.info(bug.getKey() + ": " + affectedVersions.toString());
+		LOGGER.info(() -> String.format("%s : %s", bug.getKey(), affectedVersions.toString()));
 		
 		bug.setAffectedVersions(affectedVersions);
 	}
 	
 	private static Double calculateP(int fv, int ov, Integer iv) {
-		if (iv == null || fv < iv) {
-			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.warning(String.format("Not valid IV: %d FV %d", iv, fv));
+		if (iv == null || fv <= iv) {
+				LOGGER.warning(() -> String.format("Not valid IV: %d FV: %d OV: %d", iv, fv, ov));
 			return null;
 		}
 		return ((double) (fv - iv)) / (fv - ov);
@@ -103,7 +100,7 @@ public class Proportion {
 			} else {
 				if (!mean.isEmpty()) {
 					double p = mean.getMean();
-					int iv = (int) (fv -  ((fv - ov) * p));
+					int iv = (int) Math.round((fv -  ((fv - ov) * p)));
 					addAV(ticket, iv, fv, releases);
 				} else {
 					addAV(ticket, ov, fv, releases);
