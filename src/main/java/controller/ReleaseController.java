@@ -28,7 +28,7 @@ public class ReleaseController {
 			String before = relInfo.get(i).getDate().toLocalDate().toString();
 			List<GitCommit> commits = getCommits(retriever.getCommitsHashByDate(before, after));
 			if (commits.isEmpty()) {
-				LOGGER.warning("Release " + relInfo.get(i).getVersionName() + " has no commit");
+				LOGGER.info("Release " + relInfo.get(i).getVersionName() + " has no commit");
 				relInfo.remove(i);
 			}
 			else {

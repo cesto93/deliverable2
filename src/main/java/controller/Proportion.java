@@ -19,7 +19,7 @@ public class Proportion {
 	
 	public static Integer getOV(LocalDate ticketDate, ReleaseInfo[] releases) {
 		for (int i = 0; i < releases.length; i++) {
-			if (releases[i].getDate().toLocalDate().isAfter(ticketDate)) 
+			if (!releases[i].getDate().toLocalDate().isBefore(ticketDate)) // if releaseDate equals or after ticketDate
 				return i;
 		}
 		return null;
@@ -60,6 +60,10 @@ public class Proportion {
 	}
 	
 	private static void addAV(BugTicket bug, int iv, int fv, ReleaseInfo[] releases) {	
+		if (iv < 0) {
+			iv = 0;
+		}
+		
 		if (iv >= fv)
 			return;
 		ArrayList<String> affectedVersions = new ArrayList<>();
@@ -73,9 +77,9 @@ public class Proportion {
 	}
 	
 	private static Double calculateP(int fv, int ov, Integer iv) {
-		if (iv == null || fv <= iv) {
+		if (iv == null || fv < iv) {
 			if (LOGGER.isLoggable(Level.WARNING))
-				LOGGER.warning("iv not valid \t IV: " + iv);
+				LOGGER.warning(String.format("Not valid IV: %d FV %d", iv, fv));
 			return null;
 		}
 		return ((double) (fv - iv)) / (fv - ov);
@@ -87,9 +91,8 @@ public class Proportion {
 			Integer ov = getOV(ticket.getCreationDate(), releases);
 			Integer fv = getFV(ticket, releases);
 			if ((ov == null) || (fv == null) || (fv <= ov)) {
-				if (LOGGER.isLoggable(Level.WARNING) && fv != null && ov != null && !fv.equals(ov))
-					LOGGER.warning("fv or ov not valid FV: " + fv + " date: " + 
-									ticket.getCreationDate() + "OV: " + ov);
+				if (LOGGER.isLoggable(Level.WARNING) && fv!= null && !fv.equals(ov))
+					LOGGER.warning(String.format("Not valid FV: %d date: %s OV: %d",fv, ticket.getCreationDate(),  ov));
 				continue;
 			}
 			if (ticket.getAffectedVersions().size() != 0) {
@@ -100,10 +103,6 @@ public class Proportion {
 				if (!mean.isEmpty()) {
 					double p = mean.getMean();
 					int iv = (int) (fv -  ((fv - ov) * p));
-					if (iv < 0) {
-						iv = 0;
-					}
-					LOGGER.info("IV " + iv + " FV " + fv + " OV " + ov + "\nP from mean is " + p);
 					addAV(ticket, iv, fv, releases);
 				} else {
 					addAV(ticket, ov, fv, releases);

@@ -52,7 +52,7 @@ public class ElaborateMetrics {
 		List<BugTicket> bugs = bugRepo.getBugTicket(projName, relsInfo);
 		Proportion.addMissingAV(bugs, relsInfo);
 		if (LOGGER.isLoggable(Level.INFO)) {
-			LOGGER.log(Level.INFO, "Found bug tickets: " + bugs.size() + "\nFound release: " + relsInfo.length);
+			LOGGER.info("Found bug tickets: " + bugs.size() + "\nFound release: " + relsInfo.length);
 		}
 		
 		relsInfo = Arrays.copyOfRange(relsInfo, 0, relsInfo.length / 2); //remove last half of versions

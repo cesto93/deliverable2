@@ -88,7 +88,7 @@ public class GitLogRetriever {
 					if (msg.contains(key))
 						commits.add(hash);
 					else
-						LOGGER.info("found: " + msg + " key: " + key);
+						LOGGER.info(String.format("invalid ticket found: %s key: %s",msg, key));
 			}
 			} catch (Exception e) {
 				LOGGER.log(Level.SEVERE, e.getMessage(), e);
