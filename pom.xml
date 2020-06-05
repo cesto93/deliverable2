@@ -10,7 +10,7 @@
 	<scm>
 		<connection>scm:git:git@github.com:cesto93/deliverable2.git</connection>
 		<developerConnection>scm:git:git@github.com:cesto93/deliverable2.git</developerConnection>
-		<url>https://github.com/SonarSource/cesto93/deliverable2</url>
+		<url>https://github.com/cesto93/deliverable2</url>
 	</scm>
 
 	<properties>
