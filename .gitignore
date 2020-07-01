@@ -5,12 +5,3 @@
 
 ###Maven
 /target/
-
-### csv result
-BOOKKEEPER_VersionInfo.csv
-BOOKKEEPER_File.csv
-BOOKKEEPER_Evaluation.csv
-
-ZOOKEEPER_VersionInfo.csv
-ZOOKEEPER_File.csv
-ZOOKEEPER_Evaluation.csv
